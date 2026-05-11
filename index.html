@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOD Designer — Analyse Physiologique</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0d0f10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WOD Designer">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<style>
+  :root {
+    --bg: #0d0f10;
+    --bg2: #141618;
+    --bg3: #1c1f22;
+    --border: rgba(255,255,255,0.08);
+    --border-hi: rgba(255,255,255,0.18);
+    --text: #e8eaec;
+    --muted: #7a8088;
+    --accent: #d4f060;
+    --accent-dim: rgba(212,240,96,0.12);
+    --warn-bg: rgba(255,180,60,0.1);
+    --warn-text: #ffc040;
+    --danger-bg: rgba(255,80,60,0.1);
+    --danger-text: #ff6e5a;
+    --ok-bg: rgba(100,220,140,0.1);
+    --ok-text: #64dc8c;
+    --mono: 'Courier New', Courier, monospace;
+    --display: 'Arial Narrow', Impact, sans-serif;
+    --body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 14px;
+    min-height: 100vh;
+    padding: 32px 16px 64px;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  header { margin-bottom: 36px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+  header h1 {
+    font-family: var(--display); font-size: 38px; font-weight: 700;
+    letter-spacing: .02em; line-height: 1; color: var(--accent); text-transform: uppercase;
+  }
+  header p { margin-top: 6px; color: var(--muted); font-size: 13px; letter-spacing: .03em; font-family: var(--mono); }
+  .section-label {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted); margin: 24px 0 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  label { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  select, input[type=number] {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text); font-family: var(--body); font-size: 13px;
+    padding: 9px 12px; outline: none; transition: border-color .15s; width: 100%; -webkit-appearance: none;
+  }
+  select:focus, input[type=number]:focus { border-color: var(--accent); }
+  select option { background: #1c1f22; }
+  .format-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
+  .fmt-btn {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--muted); cursor: pointer; font-family: var(--display); font-size: 14px;
+    font-weight: 600; letter-spacing: .04em; padding: 10px 4px;
+    text-align: center; text-transform: uppercase; transition: all .15s; user-select: none;
+  }
+  .fmt-btn:hover { border-color: var(--border-hi); color: var(--text); }
+  .fmt-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .cond { display: none; }
+  .cond.show { display: grid; }
+  .result { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); margin-top: 24px; overflow: hidden; }
+  .result-header {
+    background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 16px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 6px;
+  }
+  .result-header::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--border); }
+  .metric { padding: 14px 16px; border-right: 1px solid var(--border); }
+  .metric:last-child { border-right: none; }
+  .metric-label { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .metric-val { font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--accent); line-height: 1; }
+  .metric-unit { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .detail-rows { padding: 0 16px; }
+  .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-key { color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: .04em; }
+  .detail-v { color: var(--text); font-weight: 500; }
+  .messages { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border); }
+  .msg { border-radius: var(--radius); font-size: 12px; line-height: 1.55; padding: 10px 12px; display: flex; gap: 8px; align-items: flex-start; }
+  .msg::before { font-size: 13px; flex-shrink: 0; }
+  .msg.ok    { background: var(--ok-bg);     color: var(--ok-text);     }
+  .msg.warn  { background: var(--warn-bg);   color: var(--warn-text);   }
+  .msg.bad   { background: var(--danger-bg); color: var(--danger-text); }
+  .msg.ok::before   { content: 'v'; font-family: var(--mono); }
+  .msg.warn::before { content: '!'; font-family: var(--mono); }
+  .msg.bad::before  { content: 'x'; font-family: var(--mono); }
+  .ref-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
+  .ref-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+  .ref-name { font-family: var(--display); font-size: 14px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text); margin-bottom: 6px; }
+  .ref-row { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; font-family: var(--mono); }
+  .ref-row span:first-child { color: var(--muted); }
+  .ref-row span:last-child  { color: var(--accent); }
+  footer { margin-top: 48px; border-top: 1px solid var(--border); padding-top: 16px; font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: .06em; display: flex; justify-content: space-between; }
+  @media (max-width: 520px) {
+    .row2 { grid-template-columns: 1fr; }
+    .metrics { grid-template-columns: 1fr; }
+    .metric { border-right: none; border-bottom: 1px solid var(--border); }
+    .ref-grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>WOD Designer</h1>
+  <p>// Analyse physiologique des formats d'entrainement CrossFit</p>
+</header>
+
+<div class="section-label">01 -- Format</div>
+<div class="format-grid">
+  <div class="fmt-btn active" data-fmt="emom"      onclick="setFmt('emom')">EMOM</div>
+  <div class="fmt-btn"        data-fmt="amrap"     onclick="setFmt('amrap')">AMRAP</div>
+  <div class="fmt-btn"        data-fmt="fortime"   onclick="setFmt('fortime')">For Time</div>
+  <div class="fmt-btn"        data-fmt="afap"      onclick="setFmt('afap')">AFAP</div>
+  <div class="fmt-btn"        data-fmt="intervals" onclick="setFmt('intervals')">Intervals</div>
+  <div class="fmt-btn"        data-fmt="tabata"    onclick="setFmt('tabata')">Tabata</div>
+  <div class="fmt-btn"        data-fmt="chipper"   onclick="setFmt('chipper')">Chipper</div>
+  <div class="fmt-btn"        data-fmt="buyin"     onclick="setFmt('buyin')">Buy-In/Out</div>
+  <div class="fmt-btn"        data-fmt="ladder"    onclick="setFmt('ladder')">Ladder</div>
+</div>
+
+<div class="section-label">02 -- Duree et Structure</div>
+<div class="row2" id="dur-row">
+  <div class="field">
+    <label>Duree totale (min)</label>
+    <input type="number" id="duration" value="20" min="1" max="90" oninput="calc()">
+  </div>
+  <div class="field" id="interval-field">
+    <label>Intervalle</label>
+    <select id="interval" onchange="calc()">
+      <option value="1">E1MOM -- chaque minute</option>
+      <option value="2">E2MOM -- toutes les 2 min</option>
+      <option value="3">E3MOM -- toutes les 3 min</option>
+    </select>
+  </div>
+</div>
+
+<div class="cond row2" id="emom-extra">
+  <div class="field">
+    <label>Travail par intervalle (s)</label>
+    <input type="number" id="work-s" value="35" min="5" max="175" oninput="calc()">
+  </div>
+</div>
+
+<div class="cond row2" id="intervals-extra">
+  <div class="field">
+    <label>Travail (s)</label>
+    <input type="number" id="int-work" value="40" min="5" max="300" oninput="calc()">
+  </div>
+  <div class="field">
+    <label>Repos (s)</label>
+    <input type="number" id="int-rest" value="20" min="5" max="300" oninput="calc()">
+  </div>
+</div>
+
+<div class="cond row2" id="chipper-extra">
+  <div class="field">
+    <label>Nb de mouvements distincts</label>
+    <input type="number" id="chipper-mvts" value="5" min="3" max="12" oninput="calc()">
+  </div>
+  <div class="field">
+    <label>Reps totales estimees</label>
+    <input type="number" id="chipper-reps" value="150" min="30" max="500" oninput="calc()">
+  </div>
+</div>
+
+<div class="cond row2" id="buyin-extra">
+  <div class="field">
+    <label>Duree Buy-In / Cash-Out (min)</label>
+    <input type="number" id="buyin-dur" value="3" min="1" max="15" oninput="calc()">
+  </div>
+  <div class="field">
+    <label>Structure centrale</label>
+    <select id="buyin-core" onchange="calc()">
+      <option value="amrap">AMRAP central</option>
+      <option value="fortime">For Time central</option>
+      <option value="emom">EMOM central</option>
+    </select>
+  </div>
+</div>
+
+<div class="cond row2" id="ladder-extra">
+  <div class="field">
+    <label>Direction</label>
+    <select id="ladder-dir" onchange="calc()">
+      <option value="desc">Descendante (ex : 21-15-9)</option>
+      <option value="asc">Montante (ex : 1-2-3)</option>
+      <option value="pyramid">Pyramide (ex : 10-8-6-4-2)</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Nb de paliers</label>
+    <input type="number" id="ladder-steps" value="3" min="2" max="10" oninput="calc()">
+  </div>
+</div>
+
+<div class="section-label">03 -- Contenu</div>
+<div class="row2">
+  <div class="field">
+    <label>Filiere cible</label>
+    <select id="energy" onchange="calc()">
+      <option value="aerobic">Aerobie -- VO2max / endurance</option>
+      <option value="lactate">Seuil lactique</option>
+      <option value="anaerobic">Anaerobie -- capacite / puissance</option>
+      <option value="alactate">Phosphocreatine -- puissance max</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Type de mouvements</label>
+    <select id="movement" onchange="calc()">
+      <option value="mixed">Multi-modal (haltero + gym)</option>
+      <option value="weightlifting">Halterophilie dominante</option>
+      <option value="gymnastics">Gymnastics dominante</option>
+      <option value="monostructural">Mono-structural (row, run, bike)</option>
+    </select>
+  </div>
+</div>
+
+<div class="result">
+  <div class="result-header">Analyse physiologique</div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Travail effectif</div>
+      <div class="metric-val" id="m-work">--</div>
+      <div class="metric-unit">minutes</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Ratio T:R</div>
+      <div class="metric-val" id="m-ratio">--</div>
+      <div class="metric-unit">travail : repos</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Rounds / Paliers</div>
+      <div class="metric-val" id="m-rounds">--</div>
+      <div class="metric-unit">cycles</div>
+    </div>
+  </div>
+  <div class="detail-rows" id="detail-rows"></div>
+  <div class="messages" id="messages"></div>
+</div>
+
+<div class="section-label">Reference -- Filieres et Ratios</div>
+<div class="ref-grid">
+  <div class="ref-card">
+    <div class="ref-name">Phosphocreatine</div>
+    <div class="ref-row"><span>Ratio T:R</span><span>1:5 a 1:8</span></div>
+    <div class="ref-row"><span>Duree cible</span><span>0.5 a 4 min</span></div>
+    <div class="ref-row"><span>Formats</span><span>E3MOM, Intervals</span></div>
+  </div>
+  <div class="ref-card">
+    <div class="ref-name">Anaerobie lactique</div>
+    <div class="ref-row"><span>Ratio T:R</span><span>1:2 a 1:4</span></div>
+    <div class="ref-row"><span>Duree cible</span><span>2 a 8 min</span></div>
+    <div class="ref-row"><span>Formats</span><span>Tabata, Intervals, AFAP</span></div>
+  </div>
+  <div class="ref-card">
+    <div class="ref-name">Seuil lactique</div>
+    <div class="ref-row"><span>Ratio T:R</span><span>1:1 a 1:1.5</span></div>
+    <div class="ref-row"><span>Duree cible</span><span>6 a 20 min</span></div>
+    <div class="ref-row"><span>Formats</span><span>EMOM, 40/20, AMRAP</span></div>
+  </div>
+  <div class="ref-card">
+    <div class="ref-name">Aerobie / VO2max</div>
+    <div class="ref-row"><span>Ratio T:R</span><span>2:1 a continu</span></div>
+    <div class="ref-row"><span>Duree cible</span><span>10 a 40 min</span></div>
+    <div class="ref-row"><span>Formats</span><span>AMRAP, For Time, Chipper</span></div>
+  </div>
+</div>
+
+<footer>
+  <span>WOD DESIGNER v1.1</span>
+  <span>METHODE FORCE HYBRIDE -- COACH SIMON</span>
+</footer>
+
+</div>
+<script>
+var currentFmt = 'emom';
+var CONTINUOUS = ['amrap','fortime','afap','chipper','buyin','ladder'];
+var TARGETS = {
+  alactate:  {ratio_min:5,   ratio_max:8,   dur_min:0.5, dur_max:4,  label:'Phosphocreatine'},
+  anaerobic: {ratio_min:2,   ratio_max:4,   dur_min:2,   dur_max:8,  label:'Anaerobie lactique'},
+  lactate:   {ratio_min:1,   ratio_max:1.5, dur_min:6,   dur_max:20, label:'Seuil lactique'},
+  aerobic:   {ratio_min:0.3, ratio_max:1,   dur_min:10,  dur_max:40, label:'Aerobie / VO2max'}
+};
+
+function setFmt(fmt) {
+  currentFmt = fmt;
+  var btns = document.querySelectorAll('.fmt-btn');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('data-fmt') === fmt) {
+      btns[i].classList.add('active');
+    } else {
+      btns[i].classList.remove('active');
+    }
+  }
+  var condIds = ['emom-extra','intervals-extra','chipper-extra','buyin-extra','ladder-extra'];
+  for (var j = 0; j < condIds.length; j++) {
+    document.getElementById(condIds[j]).classList.remove('show');
+  }
+  if (fmt === 'emom')      { document.getElementById('emom-extra').classList.add('show'); }
+  if (fmt === 'intervals') { document.getElementById('intervals-extra').classList.add('show'); }
+  if (fmt === 'chipper')   { document.getElementById('chipper-extra').classList.add('show'); }
+  if (fmt === 'buyin')     { document.getElementById('buyin-extra').classList.add('show'); }
+  if (fmt === 'ladder')    { document.getElementById('ladder-extra').classList.add('show'); }
+  document.getElementById('interval-field').style.display = (fmt === 'emom') ? '' : 'none';
+  var dr = document.getElementById('dur-row');
+  dr.style.opacity = (fmt === 'tabata') ? '0.3' : '';
+  dr.style.pointerEvents = (fmt === 'tabata') ? 'none' : '';
+  calc();
+}
+
+function calc() {
+  var fmt      = currentFmt;
+  var dur      = parseInt(document.getElementById('duration').value) || 20;
+  var energy   = document.getElementById('energy').value;
+  var movement = document.getElementById('movement').value;
+  var tgt      = TARGETS[energy];
+  var workTotal = 0;
+  var restTotal = 0;
+  var ratio = null;
+  var rounds = 0;
+  var formatDesc = '';
+
+  if (fmt === 'emom') {
+    var ws = parseInt(document.getElementById('work-s').value) || 35;
+    var intv = parseInt(document.getElementById('interval').value) || 1;
+    var intv_s = intv * 60;
+    var rest_s = intv_s - ws;
+    if (rest_s <= 0) {
+      document.getElementById('messages').innerHTML = '<div class="msg bad">La duree de travail depasse l intervalle. Reduis le travail ou augmente l intervalle.</div>';
+      return;
+    }
+    rounds = Math.floor((dur * 60) / intv_s);
+    workTotal = Math.round(rounds * ws / 60 * 10) / 10;
+    restTotal = Math.round(rounds * rest_s / 60 * 10) / 10;
+    ratio = Math.round((ws / rest_s) * 100) / 100;
+    formatDesc = rounds + ' rounds x ' + ws + 's travail / ' + rest_s + 's repos';
+
+  } else if (fmt === 'tabata') {
+    workTotal = 2.7;
+    restTotal = 1.3;
+    ratio = 2;
+    rounds = 8;
+    formatDesc = '8 rounds x 20s / 10s -- 4 min fixe';
+
+  } else if (fmt === 'amrap') {
+    workTotal = dur;
+    restTotal = 0;
+    rounds = 1;
+    formatDesc = dur + ' min continus -- score en rounds + reps';
+
+  } else if (fmt === 'fortime') {
+    workTotal = dur;
+    restTotal = 0;
+    rounds = 1;
+    formatDesc = 'Volume fixe -- score en temps (estimation : ' + dur + ' min)';
+
+  } else if (fmt === 'afap') {
+    workTotal = dur;
+    restTotal = 0;
+    rounds = 1;
+    formatDesc = 'Volume fixe -- effort maximal, score en temps';
+
+  } else if (fmt === 'intervals') {
+    var iw = parseInt(document.getElementById('int-work').value) || 40;
+    var ir = parseInt(document.getElementById('int-rest').value) || 20;
+    var cycle = iw + ir;
+    rounds = Math.floor((dur * 60) / cycle);
+    workTotal = Math.round(rounds * iw / 60 * 10) / 10;
+    restTotal = Math.round(rounds * ir / 60 * 10) / 10;
+    ratio = Math.round((iw / ir) * 100) / 100;
+    formatDesc = rounds + ' rounds x ' + iw + 's travail / ' + ir + 's repos';
+
+  } else if (fmt === 'chipper') {
+    var mvts = parseInt(document.getElementById('chipper-mvts').value) || 5;
+    var reps = parseInt(document.getElementById('chipper-reps').value) || 150;
+    workTotal = dur;
+    restTotal = 0;
+    rounds = mvts;
+    formatDesc = mvts + ' mouvements x ~' + Math.round(reps / mvts) + ' reps -- passage unique';
+
+  } else if (fmt === 'buyin') {
+    var bDur = parseInt(document.getElementById('buyin-dur').value) || 3;
+    var core = document.getElementById('buyin-core').value;
+    workTotal = dur;
+    restTotal = 0;
+    rounds = 1;
+    formatDesc = 'Buy-In/Out ' + bDur + ' min + ' + core.toUpperCase() + ' ' + (dur - bDur) + ' min';
+
+  } else if (fmt === 'ladder') {
+    var dir = document.getElementById('ladder-dir').value;
+    var steps = parseInt(document.getElementById('ladder-steps').value) || 3;
+    workTotal = dur;
+    restTotal = 0;
+    rounds = steps;
+    var dirLabel = (dir === 'desc') ? 'Descendante' : (dir === 'asc') ? 'Montante' : 'Pyramide';
+    formatDesc = dirLabel + ' -- ' + steps + ' paliers';
+  }
+
+  document.getElementById('m-work').textContent   = workTotal;
+  document.getElementById('m-ratio').textContent  = (ratio !== null) ? ratio + ':1' : 'cont.';
+  document.getElementById('m-rounds').textContent = rounds;
+
+  var isContinuous = (CONTINUOUS.indexOf(fmt) !== -1);
+  var details = [
+    ['Structure',           formatDesc],
+    ['Filiere cible',       tgt.label],
+    ['Zone optimale',       tgt.dur_min + ' a ' + tgt.dur_max + ' min'],
+    ['Ratio T:R optimal',   '1:' + tgt.ratio_min + ' a 1:' + tgt.ratio_max]
+  ];
+  if (!isContinuous) {
+    details.push(['Repos total', restTotal + ' min']);
+  }
+  var dHTML = '';
+  for (var d = 0; d < details.length; d++) {
+    dHTML += '<div class="detail-row"><span class="detail-key">' + details[d][0] + '</span><span class="detail-v">' + details[d][1] + '</span></div>';
+  }
+  document.getElementById('detail-rows').innerHTML = dHTML;
+
+  var msgs = [];
+
+  if (ratio !== null) {
+    if (energy === 'alactate' && ratio > 0.5) {
+      msgs.push({cls:'bad', text:'Ratio T:R trop eleve pour la filiere phosphocreatine (' + ratio + ':1). Cible : 1:5 a 1:8 -- augmente le repos.'});
+    } else if (energy === 'anaerobic' && ratio > 0.7) {
+      msgs.push({cls:'warn', text:'Ratio T:R (' + ratio + ':1) trop dense pour l anaerobie lactique. Vise 1:2 a 1:4.'});
+    } else if (energy === 'aerobic' && ratio < 0.4) {
+      msgs.push({cls:'warn', text:'Trop de repos pour un objectif aerobie (ratio ' + ratio + ':1). La filiere aerobie se developpe sous pression continue.'});
+    }
+  }
+
+  if (workTotal < tgt.dur_min) {
+    msgs.push({cls:'bad', text:'Volume de travail effectif (' + workTotal + ' min) insuffisant pour la filiere ' + tgt.label + '. Minimum : ' + tgt.dur_min + ' min.'});
+  } else if (workTotal > tgt.dur_max) {
+    msgs.push({cls:'warn', text:'Volume de travail (' + workTotal + ' min) depasse la zone optimale pour ' + tgt.label + ' (max : ' + tgt.dur_max + ' min).'});
+  }
+
+  if (movement === 'weightlifting' && (fmt === 'amrap' || fmt === 'fortime' || fmt === 'afap') && dur > 12) {
+    msgs.push({cls:'warn', text:'Halterophilie dominante sur ' + dur + ' min sans repos : risque de degradation technique sous fatigue. Envisage un EMOM ou des intervalles.'});
+  }
+  if (movement === 'gymnastics' && fmt === 'emom') {
+    msgs.push({cls:'ok', text:'EMOM + gymnastics : format optimal pour developper la technique sous fatigue controlee.'});
+  }
+
+  if (fmt === 'afap') {
+    if (dur < 4) {
+      msgs.push({cls:'warn', text:'Duree < 4 min : effort quasi-sprint, filiere anaerobie dominante.'});
+    } else if (dur > 20) {
+      msgs.push({cls:'warn', text:'Duree > 20 min en AFAP : l athlète va inevitablement gerer son allure. Envisage un AMRAP ou des intervalles.'});
+    } else {
+      msgs.push({cls:'ok', text:'Zone AFAP optimale (4-20 min). Assure-toi que le volume permet un effort maximal soutenu.'});
+    }
+  }
+
+  if (fmt === 'chipper') {
+    var cM = parseInt(document.getElementById('chipper-mvts').value) || 5;
+    var cR = parseInt(document.getElementById('chipper-reps').value) || 150;
+    if (cM > 7) {
+      msgs.push({cls:'warn', text:cM + ' mouvements distincts : risque de confusion. Ideal : 4-6 mouvements max.'});
+    }
+    if (cR > 250) {
+      msgs.push({cls:'warn', text:'Volume total eleve (' + cR + ' reps). Place les mouvements techniques en debut de sequence.'});
+    }
+    msgs.push({cls:'ok', text:'Chipper : mouvements techniques ou lourds en debut, mouvements simples (burpees, sit-ups) en fin.'});
+  }
+
+  if (fmt === 'buyin') {
+    var bV = parseInt(document.getElementById('buyin-dur').value) || 3;
+    if (bV > 5) {
+      msgs.push({cls:'warn', text:'Buy-In > 5 min : fatigue pre-existante trop elevee, risque de compromettre le WOD central. Maintiens entre 2 et 4 min.'});
+    } else {
+      msgs.push({cls:'ok', text:'Buy-In bien dose. Cree une fatigue controlee avant le WOD central. Cash-Out = accumulation de volume accessoire cible.'});
+    }
+  }
+
+  if (fmt === 'ladder') {
+    var lDir = document.getElementById('ladder-dir').value;
+    if (lDir === 'desc') {
+      msgs.push({cls:'ok', text:'Ladder descendante (21-15-9) : volume decroit quand la fatigue augmente -- l athlète peut accelerer sur les derniers paliers.'});
+    } else if (lDir === 'asc') {
+      msgs.push({cls:'warn', text:'Ladder montante : volume croissant sous fatigue croissante. Prevois une charge moderee ou un format I go / you go pour creer du repos passif.'});
+    } else {
+      msgs.push({cls:'ok', text:'Pyramide : pic d intensite au milieu, puis volume decroissant. Bonne structure pour du volume modere avec recuperation progressive.'});
+    }
+  }
+
+  if (msgs.length === 0) {
+    msgs.push({cls:'ok', text:'Coherence physiologique validee. Parametres compatibles avec la filiere ' + tgt.label + '.'});
+  }
+
+  var mHTML = '';
+  for (var m = 0; m < msgs.length; m++) {
+    mHTML += '<div class="msg ' + msgs[m].cls + '">' + msgs[m].text + '</div>';
+  }
+  document.getElementById('messages').innerHTML = mHTML;
+}
+
+setFmt('emom');
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+</body>
+</html>
