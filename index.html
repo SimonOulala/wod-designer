@@ -637,7 +637,7 @@ function setFmt(fmt) {
 
 function openTab(tab) {
   currentTab = tab;
-  var panels = ['a','b','c'];
+  var panels = ['a','b','c','d'];
   for (var i = 0; i < panels.length; i++) {
     document.getElementById('tab-'+panels[i]).classList.toggle('active', panels[i]===tab);
     document.getElementById('panel-'+panels[i]).classList.toggle('show', panels[i]===tab);
