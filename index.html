@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WOD Designer — Analyse Physiologique</title>
+<title>WOD Designer</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0d0f10">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,111 +11,133 @@
 <meta name="apple-mobile-web-app-title" content="WOD Designer">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <style>
-  :root {
-    --bg: #0d0f10;
-    --bg2: #141618;
-    --bg3: #1c1f22;
-    --border: rgba(255,255,255,0.08);
-    --border-hi: rgba(255,255,255,0.18);
-    --text: #e8eaec;
-    --muted: #7a8088;
-    --accent: #d4f060;
-    --accent-dim: rgba(212,240,96,0.12);
-    --warn-bg: rgba(255,180,60,0.1);
-    --warn-text: #ffc040;
-    --danger-bg: rgba(255,80,60,0.1);
-    --danger-text: #ff6e5a;
-    --ok-bg: rgba(100,220,140,0.1);
-    --ok-text: #64dc8c;
-    --mono: 'Courier New', Courier, monospace;
-    --display: 'Arial Narrow', Impact, sans-serif;
-    --body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    --radius: 6px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--body);
-    font-size: 14px;
-    min-height: 100vh;
-    padding: 32px 16px 64px;
-  }
-  .container { max-width: 720px; margin: 0 auto; }
-  header { margin-bottom: 36px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-  header h1 {
-    font-family: var(--display); font-size: 38px; font-weight: 700;
-    letter-spacing: .02em; line-height: 1; color: var(--accent); text-transform: uppercase;
-  }
-  header p { margin-top: 6px; color: var(--muted); font-size: 13px; letter-spacing: .03em; font-family: var(--mono); }
-  .section-label {
-    font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
-    text-transform: uppercase; color: var(--muted); margin: 24px 0 10px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  label { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-  select, input[type=number] {
-    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
-    color: var(--text); font-family: var(--body); font-size: 13px;
-    padding: 9px 12px; outline: none; transition: border-color .15s; width: 100%; -webkit-appearance: none;
-  }
-  select:focus, input[type=number]:focus { border-color: var(--accent); }
-  select option { background: #1c1f22; }
-  .format-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
-  .fmt-btn {
-    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
-    color: var(--muted); cursor: pointer; font-family: var(--display); font-size: 14px;
-    font-weight: 600; letter-spacing: .04em; padding: 10px 4px;
-    text-align: center; text-transform: uppercase; transition: all .15s; user-select: none;
-  }
-  .fmt-btn:hover { border-color: var(--border-hi); color: var(--text); }
-  .fmt-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-  .cond { display: none; }
-  .cond.show { display: grid; }
-  .result { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); margin-top: 24px; overflow: hidden; }
-  .result-header {
-    background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 16px;
-    font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
-    text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 6px;
-  }
-  .result-header::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
-  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--border); }
-  .metric { padding: 14px 16px; border-right: 1px solid var(--border); }
-  .metric:last-child { border-right: none; }
-  .metric-label { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-  .metric-val { font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--accent); line-height: 1; }
-  .metric-unit { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .detail-rows { padding: 0 16px; }
-  .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .detail-row:last-child { border-bottom: none; }
-  .detail-key { color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: .04em; }
-  .detail-v { color: var(--text); font-weight: 500; }
-  .messages { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border); }
-  .msg { border-radius: var(--radius); font-size: 12px; line-height: 1.55; padding: 10px 12px; display: flex; gap: 8px; align-items: flex-start; }
-  .msg::before { font-size: 13px; flex-shrink: 0; }
-  .msg.ok    { background: var(--ok-bg);     color: var(--ok-text);     }
-  .msg.warn  { background: var(--warn-bg);   color: var(--warn-text);   }
-  .msg.bad   { background: var(--danger-bg); color: var(--danger-text); }
-  .msg.ok::before   { content: 'v'; font-family: var(--mono); }
-  .msg.warn::before { content: '!'; font-family: var(--mono); }
-  .msg.bad::before  { content: 'x'; font-family: var(--mono); }
-  .ref-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
-  .ref-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
-  .ref-name { font-family: var(--display); font-size: 14px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text); margin-bottom: 6px; }
-  .ref-row { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; font-family: var(--mono); }
-  .ref-row span:first-child { color: var(--muted); }
-  .ref-row span:last-child  { color: var(--accent); }
-  footer { margin-top: 48px; border-top: 1px solid var(--border); padding-top: 16px; font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: .06em; display: flex; justify-content: space-between; }
-  @media (max-width: 520px) {
-    .row2 { grid-template-columns: 1fr; }
-    .metrics { grid-template-columns: 1fr; }
-    .metric { border-right: none; border-bottom: 1px solid var(--border); }
-    .ref-grid { grid-template-columns: 1fr; }
-    header h1 { font-size: 28px; }
-  }
+:root {
+  --bg:#0d0f10; --bg2:#141618; --bg3:#1c1f22; --bg4:#22262a;
+  --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.18);
+  --text:#e8eaec; --muted:#7a8088; --accent:#d4f060; --accent-dim:rgba(212,240,96,0.12);
+  --warn-bg:rgba(255,180,60,0.1); --warn-text:#ffc040;
+  --danger-bg:rgba(255,80,60,0.1); --danger-text:#ff6e5a;
+  --ok-bg:rgba(100,220,140,0.1); --ok-text:#64dc8c;
+  --blue-bg:rgba(80,160,255,0.1); --blue-text:#70b8ff;
+  --mono:'Courier New',Courier,monospace;
+  --display:'Arial Narrow',Impact,sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --r:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14px;min-height:100vh;padding:28px 16px 80px;}
+.container{max-width:720px;margin:0 auto;}
+header{margin-bottom:28px;border-bottom:1px solid var(--border);padding-bottom:16px;}
+header h1{font-family:var(--display);font-size:34px;font-weight:700;letter-spacing:.02em;line-height:1;color:var(--accent);text-transform:uppercase;}
+header p{margin-top:5px;color:var(--muted);font-size:11px;letter-spacing:.04em;font-family:var(--mono);}
+.slabel{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px;display:flex;align-items:center;gap:8px;}
+.slabel::after{content:'';flex:1;height:1px;background:var(--border);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+select,input[type=number]{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--body);font-size:13px;padding:8px 11px;outline:none;transition:border-color .15s;width:100%;-webkit-appearance:none;}
+select:focus,input[type=number]:focus{border-color:var(--accent);}
+select option{background:#1c1f22;}
+
+/* Format buttons */
+.fmt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:4px;}
+.fmt-btn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--muted);cursor:pointer;font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.04em;padding:9px 4px;text-align:center;text-transform:uppercase;transition:all .15s;user-select:none;}
+.fmt-btn:hover{border-color:var(--border-hi);color:var(--text);}
+.fmt-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+
+/* Format info card */
+.finfo{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-top:8px;overflow:hidden;}
+.finfo-hd{padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:10px;}
+.finfo-name{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);}
+.finfo-tag{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.finfo-desc{padding:11px 13px;font-size:12px;color:var(--text);line-height:1.65;border-bottom:1px solid var(--border);}
+.finfo-ex{padding:11px 13px;}
+.finfo-ex-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.wod-block{background:var(--bg3);border-radius:var(--r);padding:10px 12px;font-size:12px;line-height:1.8;color:var(--text);border-left:2px solid var(--accent);}
+.wod-block .wt{color:var(--accent);font-weight:600;font-family:var(--mono);font-size:11px;letter-spacing:.04em;display:block;margin-bottom:3px;}
+.wod-block .wp{display:inline-block;background:rgba(212,240,96,0.12);color:var(--accent);font-family:var(--mono);font-size:10px;padding:1px 6px;border-radius:3px;margin:1px 2px;}
+.wod-block .wnote{color:var(--muted);font-size:11px;margin-top:6px;display:block;font-style:italic;}
+
+/* Pattern tools tab bar */
+.ptabs{display:flex;gap:6px;margin-top:10px;}
+.ptab{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--muted);cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.05em;padding:8px 6px;text-align:center;text-transform:uppercase;transition:all .15s;user-select:none;}
+.ptab:hover{border-color:var(--border-hi);color:var(--text);}
+.ptab.active{background:var(--blue-bg);border-color:var(--blue-text);color:var(--blue-text);}
+.ptab-panel{display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-top:6px;overflow:hidden;}
+.ptab-panel.show{display:block;}
+
+/* Option A — filtrage */
+.pat-list{padding:12px 13px;display:flex;flex-direction:column;gap:6px;}
+.pat-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);cursor:pointer;transition:border-color .15s;}
+.pat-item.checked{border-color:var(--accent);background:var(--accent-dim);}
+.pat-item.incompatible{opacity:0.4;pointer-events:none;}
+.pat-cb{width:14px;height:14px;border:1px solid var(--border-hi);border-radius:3px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--accent);}
+.pat-item.checked .pat-cb{background:var(--accent);border-color:var(--accent);color:#0d0f10;}
+.pat-info{flex:1;}
+.pat-name{font-size:13px;font-weight:500;color:var(--text);}
+.pat-item.checked .pat-name{color:var(--accent);}
+.pat-why{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5;}
+.pat-tag{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);margin-left:6px;}
+.pat-interference{padding:10px 13px;border-top:1px solid var(--border);}
+.pat-interference-title{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+
+/* Option B — suggestions */
+.combo-list{padding:12px 13px;display:flex;flex-direction:column;gap:8px;}
+.combo-card{background:var(--bg3);border-radius:var(--r);padding:10px 12px;border-left:2px solid var(--border-hi);}
+.combo-card.recommended{border-left-color:var(--accent);}
+.combo-title{font-family:var(--display);font-size:13px;font-weight:600;text-transform:uppercase;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.combo-badge{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;}
+.badge-rec{background:var(--ok-bg);color:var(--ok-text);}
+.badge-adv{background:var(--warn-bg);color:var(--warn-text);}
+.combo-patterns{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px;}
+.combo-pat{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(212,240,96,0.1);color:var(--accent);}
+.combo-why{font-size:11px;color:var(--muted);line-height:1.5;}
+
+/* Conditionals */
+.cond{display:none;}
+.cond.show{display:grid;}
+
+/* Result */
+.result{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-top:20px;overflow:hidden;}
+.result-hd{background:var(--bg2);border-bottom:1px solid var(--border);padding:9px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.result-hd::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border);}
+.metric{padding:11px 13px;border-right:1px solid var(--border);}
+.metric:last-child{border-right:none;}
+.metric-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.metric-val{font-family:var(--display);font-size:24px;font-weight:700;color:var(--accent);line-height:1;}
+.metric-unit{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:1px;}
+.drows{padding:0 14px;}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.drow:last-child{border-bottom:none;}
+.dk{color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.04em;}
+.dv{color:var(--text);font-weight:500;}
+.msgs{padding:9px 13px;display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--border);}
+.msg{border-radius:var(--r);font-size:12px;line-height:1.55;padding:8px 10px;display:flex;gap:7px;align-items:flex-start;}
+.msg::before{font-size:11px;flex-shrink:0;font-family:var(--mono);font-weight:700;}
+.msg.ok{background:var(--ok-bg);color:var(--ok-text);}
+.msg.warn{background:var(--warn-bg);color:var(--warn-text);}
+.msg.bad{background:var(--danger-bg);color:var(--danger-text);}
+.msg.ok::before{content:'OK';}
+.msg.warn::before{content:'!!';}
+.msg.bad::before{content:'KO';}
+
+.ref-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:7px;}
+.ref-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;}
+.ref-name{font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text);margin-bottom:5px;}
+.ref-row{display:flex;justify-content:space-between;font-size:11px;padding:2px 0;font-family:var(--mono);}
+.ref-row span:first-child{color:var(--muted);}
+.ref-row span:last-child{color:var(--accent);}
+footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;display:flex;justify-content:space-between;}
+@media(max-width:520px){
+  .row2{grid-template-columns:1fr;}
+  .metrics{grid-template-columns:1fr;}
+  .metric{border-right:none;border-bottom:1px solid var(--border);}
+  .ref-grid{grid-template-columns:1fr;}
+  header h1{font-size:28px;}
+  .ptabs{flex-wrap:wrap;}
+  .ptab{flex:none;width:calc(33% - 4px);}
+}
 </style>
 </head>
 <body>
@@ -123,11 +145,11 @@
 
 <header>
   <h1>WOD Designer</h1>
-  <p>// Analyse physiologique des formats d'entrainement CrossFit</p>
+  <p>// Analyse physiologique — formats & patterns — v1.3</p>
 </header>
 
-<div class="section-label">01 -- Format</div>
-<div class="format-grid">
+<div class="slabel">01 -- Format</div>
+<div class="fmt-grid">
   <div class="fmt-btn active" data-fmt="emom"      onclick="setFmt('emom')">EMOM</div>
   <div class="fmt-btn"        data-fmt="amrap"     onclick="setFmt('amrap')">AMRAP</div>
   <div class="fmt-btn"        data-fmt="fortime"   onclick="setFmt('fortime')">For Time</div>
@@ -139,7 +161,50 @@
   <div class="fmt-btn"        data-fmt="ladder"    onclick="setFmt('ladder')">Ladder</div>
 </div>
 
-<div class="section-label">02 -- Duree et Structure</div>
+<!-- Format info -->
+<div class="finfo">
+  <div class="finfo-hd">
+    <span class="finfo-name" id="fi-name"></span>
+    <span class="finfo-tag" id="fi-tag"></span>
+  </div>
+  <div class="finfo-desc" id="fi-desc"></div>
+  <div class="finfo-ex">
+    <div class="finfo-ex-lbl">Exemple annote</div>
+    <div class="wod-block" id="fi-example"></div>
+  </div>
+</div>
+
+<!-- Pattern tools -->
+<div class="slabel">Outils patterns de mouvement</div>
+<div class="ptabs">
+  <div class="ptab" id="tab-a" onclick="openTab('a')">A — Filtrage</div>
+  <div class="ptab" id="tab-b" onclick="openTab('b')">B — Combinaisons</div>
+  <div class="ptab" id="tab-c" onclick="openTab('c')">C — Exemple annote</div>
+</div>
+
+<!-- Panel A: filtrage -->
+<div class="ptab-panel" id="panel-a">
+  <div class="pat-list" id="pat-list"></div>
+  <div class="pat-interference" id="pat-interference" style="display:none">
+    <div class="pat-interference-title">Analyse des interferences</div>
+    <div id="pat-interference-body"></div>
+  </div>
+</div>
+
+<!-- Panel B: combinaisons -->
+<div class="ptab-panel" id="panel-b">
+  <div class="combo-list" id="combo-list"></div>
+</div>
+
+<!-- Panel C: exemple annote -->
+<div class="ptab-panel" id="panel-c">
+  <div style="padding:12px 13px;">
+    <div class="finfo-ex-lbl" style="margin-bottom:8px">Seance de reference — patterns mobilises</div>
+    <div class="wod-block" id="panel-c-content"></div>
+  </div>
+</div>
+
+<div class="slabel">02 -- Duree et Structure</div>
 <div class="row2" id="dur-row">
   <div class="field">
     <label>Duree totale (min)</label>
@@ -154,43 +219,23 @@
     </select>
   </div>
 </div>
-
 <div class="cond row2" id="emom-extra">
   <div class="field">
     <label>Travail par intervalle (s)</label>
     <input type="number" id="work-s" value="35" min="5" max="175" oninput="calc()">
   </div>
 </div>
-
 <div class="cond row2" id="intervals-extra">
-  <div class="field">
-    <label>Travail (s)</label>
-    <input type="number" id="int-work" value="40" min="5" max="300" oninput="calc()">
-  </div>
-  <div class="field">
-    <label>Repos (s)</label>
-    <input type="number" id="int-rest" value="20" min="5" max="300" oninput="calc()">
-  </div>
+  <div class="field"><label>Travail (s)</label><input type="number" id="int-work" value="40" min="5" max="300" oninput="calc()"></div>
+  <div class="field"><label>Repos (s)</label><input type="number" id="int-rest" value="20" min="5" max="300" oninput="calc()"></div>
 </div>
-
 <div class="cond row2" id="chipper-extra">
-  <div class="field">
-    <label>Nb de mouvements distincts</label>
-    <input type="number" id="chipper-mvts" value="5" min="3" max="12" oninput="calc()">
-  </div>
-  <div class="field">
-    <label>Reps totales estimees</label>
-    <input type="number" id="chipper-reps" value="150" min="30" max="500" oninput="calc()">
-  </div>
+  <div class="field"><label>Nb de mouvements</label><input type="number" id="chipper-mvts" value="5" min="3" max="12" oninput="calc()"></div>
+  <div class="field"><label>Reps totales estimees</label><input type="number" id="chipper-reps" value="150" min="30" max="500" oninput="calc()"></div>
 </div>
-
 <div class="cond row2" id="buyin-extra">
-  <div class="field">
-    <label>Duree Buy-In / Cash-Out (min)</label>
-    <input type="number" id="buyin-dur" value="3" min="1" max="15" oninput="calc()">
-  </div>
-  <div class="field">
-    <label>Structure centrale</label>
+  <div class="field"><label>Duree Buy-In/Out (min)</label><input type="number" id="buyin-dur" value="3" min="1" max="15" oninput="calc()"></div>
+  <div class="field"><label>Structure centrale</label>
     <select id="buyin-core" onchange="calc()">
       <option value="amrap">AMRAP central</option>
       <option value="fortime">For Time central</option>
@@ -198,23 +243,18 @@
     </select>
   </div>
 </div>
-
 <div class="cond row2" id="ladder-extra">
-  <div class="field">
-    <label>Direction</label>
+  <div class="field"><label>Direction</label>
     <select id="ladder-dir" onchange="calc()">
-      <option value="desc">Descendante (ex : 21-15-9)</option>
-      <option value="asc">Montante (ex : 1-2-3)</option>
-      <option value="pyramid">Pyramide (ex : 10-8-6-4-2)</option>
+      <option value="desc">Descendante (21-15-9)</option>
+      <option value="asc">Montante (1-2-3)</option>
+      <option value="pyramid">Pyramide (10-8-6-4-2)</option>
     </select>
   </div>
-  <div class="field">
-    <label>Nb de paliers</label>
-    <input type="number" id="ladder-steps" value="3" min="2" max="10" oninput="calc()">
-  </div>
+  <div class="field"><label>Nb de paliers</label><input type="number" id="ladder-steps" value="3" min="2" max="10" oninput="calc()"></div>
 </div>
 
-<div class="section-label">03 -- Contenu</div>
+<div class="slabel">03 -- Contenu</div>
 <div class="row2">
   <div class="field">
     <label>Filiere cible</label>
@@ -237,290 +277,549 @@
 </div>
 
 <div class="result">
-  <div class="result-header">Analyse physiologique</div>
+  <div class="result-hd">Analyse physiologique</div>
   <div class="metrics">
-    <div class="metric">
-      <div class="metric-label">Travail effectif</div>
-      <div class="metric-val" id="m-work">--</div>
-      <div class="metric-unit">minutes</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Ratio T:R</div>
-      <div class="metric-val" id="m-ratio">--</div>
-      <div class="metric-unit">travail : repos</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Rounds / Paliers</div>
-      <div class="metric-val" id="m-rounds">--</div>
-      <div class="metric-unit">cycles</div>
-    </div>
+    <div class="metric"><div class="metric-lbl">Travail effectif</div><div class="metric-val" id="m-work">--</div><div class="metric-unit">minutes</div></div>
+    <div class="metric"><div class="metric-lbl">Ratio T:R</div><div class="metric-val" id="m-ratio">--</div><div class="metric-unit">travail:repos</div></div>
+    <div class="metric"><div class="metric-lbl">Rounds</div><div class="metric-val" id="m-rounds">--</div><div class="metric-unit">cycles</div></div>
   </div>
-  <div class="detail-rows" id="detail-rows"></div>
-  <div class="messages" id="messages"></div>
+  <div class="drows" id="detail-rows"></div>
+  <div class="msgs" id="messages"></div>
 </div>
 
-<div class="section-label">Reference -- Filieres et Ratios</div>
+<div class="slabel">Reference -- Filieres</div>
 <div class="ref-grid">
-  <div class="ref-card">
-    <div class="ref-name">Phosphocreatine</div>
-    <div class="ref-row"><span>Ratio T:R</span><span>1:5 a 1:8</span></div>
-    <div class="ref-row"><span>Duree cible</span><span>0.5 a 4 min</span></div>
-    <div class="ref-row"><span>Formats</span><span>E3MOM, Intervals</span></div>
-  </div>
-  <div class="ref-card">
-    <div class="ref-name">Anaerobie lactique</div>
-    <div class="ref-row"><span>Ratio T:R</span><span>1:2 a 1:4</span></div>
-    <div class="ref-row"><span>Duree cible</span><span>2 a 8 min</span></div>
-    <div class="ref-row"><span>Formats</span><span>Tabata, Intervals, AFAP</span></div>
-  </div>
-  <div class="ref-card">
-    <div class="ref-name">Seuil lactique</div>
-    <div class="ref-row"><span>Ratio T:R</span><span>1:1 a 1:1.5</span></div>
-    <div class="ref-row"><span>Duree cible</span><span>6 a 20 min</span></div>
-    <div class="ref-row"><span>Formats</span><span>EMOM, 40/20, AMRAP</span></div>
-  </div>
-  <div class="ref-card">
-    <div class="ref-name">Aerobie / VO2max</div>
-    <div class="ref-row"><span>Ratio T:R</span><span>2:1 a continu</span></div>
-    <div class="ref-row"><span>Duree cible</span><span>10 a 40 min</span></div>
-    <div class="ref-row"><span>Formats</span><span>AMRAP, For Time, Chipper</span></div>
-  </div>
+  <div class="ref-card"><div class="ref-name">Phosphocreatine</div><div class="ref-row"><span>Ratio T:R</span><span>1:5 a 1:8</span></div><div class="ref-row"><span>Duree</span><span>0.5-4 min</span></div><div class="ref-row"><span>Formats</span><span>E3MOM, Intervals</span></div></div>
+  <div class="ref-card"><div class="ref-name">Anaerobie lactique</div><div class="ref-row"><span>Ratio T:R</span><span>1:2 a 1:4</span></div><div class="ref-row"><span>Duree</span><span>2-8 min</span></div><div class="ref-row"><span>Formats</span><span>Tabata, Intervals, AFAP</span></div></div>
+  <div class="ref-card"><div class="ref-name">Seuil lactique</div><div class="ref-row"><span>Ratio T:R</span><span>1:1 a 1:1.5</span></div><div class="ref-row"><span>Duree</span><span>6-20 min</span></div><div class="ref-row"><span>Formats</span><span>EMOM, 40/20, AMRAP</span></div></div>
+  <div class="ref-card"><div class="ref-name">Aerobie / VO2max</div><div class="ref-row"><span>Ratio T:R</span><span>2:1 a continu</span></div><div class="ref-row"><span>Duree</span><span>10-40 min</span></div><div class="ref-row"><span>Formats</span><span>AMRAP, For Time, Chipper</span></div></div>
 </div>
 
 <footer>
-  <span>WOD DESIGNER v1.1</span>
+  <span>WOD DESIGNER v1.3</span>
   <span>METHODE FORCE HYBRIDE -- COACH SIMON</span>
 </footer>
-
 </div>
+
 <script>
 var currentFmt = 'emom';
+var currentTab = null;
+var checkedPatterns = [];
+
 var CONTINUOUS = ['amrap','fortime','afap','chipper','buyin','ladder'];
 var TARGETS = {
-  alactate:  {ratio_min:5,   ratio_max:8,   dur_min:0.5, dur_max:4,  label:'Phosphocreatine'},
-  anaerobic: {ratio_min:2,   ratio_max:4,   dur_min:2,   dur_max:8,  label:'Anaerobie lactique'},
-  lactate:   {ratio_min:1,   ratio_max:1.5, dur_min:6,   dur_max:20, label:'Seuil lactique'},
-  aerobic:   {ratio_min:0.3, ratio_max:1,   dur_min:10,  dur_max:40, label:'Aerobie / VO2max'}
+  alactate: {ratio_min:5,ratio_max:8,dur_min:0.5,dur_max:4,label:'Phosphocreatine'},
+  anaerobic:{ratio_min:2,ratio_max:4,dur_min:2,dur_max:8,label:'Anaerobie lactique'},
+  lactate:  {ratio_min:1,ratio_max:1.5,dur_min:6,dur_max:20,label:'Seuil lactique'},
+  aerobic:  {ratio_min:0.3,ratio_max:1,dur_min:10,dur_max:40,label:'Aerobie / VO2max'}
 };
+
+/* =====================================================================
+   ALL PATTERNS
+   id, name, category (push/pull/hinge/squat/core/mono/carry/olympic),
+   muscles (for interference detection),
+   note (why it works in each format context)
+===================================================================== */
+var ALL_PATTERNS = [
+  {id:'squat',    name:'Squat',              cat:'Squat',      muscles:['quad','glute','core'],        note:'Mouvement de force basse chaine, recrutement quad dominant. Transfert direct vers le squat olympique et le thruster.'},
+  {id:'hinge',    name:'Hinge / Hip Hinge',  cat:'Hinge',      muscles:['hamstring','glute','erector'],note:'Pattern fondamental de la chaine posterieure. Base du deadlift, KB swing, clean, snatch.'},
+  {id:'push_h',   name:'Poussee horizontale',cat:'Push',       muscles:['pec','front_delt','tricep'],  note:'Push-up, bench press, ring push-up. Transfert vers le jerk et le dip. Fatigable rapidement en volume.'},
+  {id:'push_v',   name:'Poussee verticale',  cat:'Push',       muscles:['front_delt','tricep','trap'],note:'Strict press, push press, HSPU. Forte demande SNC sur les variantes strictes.'},
+  {id:'pull_h',   name:'Traction horizontale',cat:'Pull',      muscles:['lats','rhomboid','bicep'],    note:'Row (barre, anneau, haltere). Antagoniste direct de la poussee horizontale. Souvent sous-represente en CrossFit.'},
+  {id:'pull_v',   name:'Traction verticale', cat:'Pull',       muscles:['lats','bicep','rear_delt'],   note:'Pull-up, C2B, muscle-up. Le goulet d etranglement le plus frequent en competition CrossFit.'},
+  {id:'olympic',  name:'Haltero olympique',  cat:'Olympic',    muscles:['full_body','SNC'],            note:'Snatch, Clean, Jerk et variantes. Charge neuromusculaire elevee. Necessite recuperation complete entre series.'},
+  {id:'carry',    name:'Porter / Farmer carry',cat:'Carry',    muscles:['trap','core','grip','quad'],  note:'Sac, atlas, yoke, farmer handles. Developpement de la force fonctionnelle et de la stabilite sous charge asymetrique.'},
+  {id:'core_flex',name:'Gainage / Flexion',  cat:'Core',       muscles:['core','hip_flexor'],          note:'T2B, GHD sit-up, L-sit. Demande flexion de hanche et stabilite lombaire. Attention au volume cumule.'},
+  {id:'mono',     name:'Mono-structural',    cat:'Cardio',     muscles:['full_cardio'],                note:'Run, row, bike, ski, jump rope. Le seul pattern sans interference musculaire directe avec les autres. Cle des WODs metaboliques.'},
+  {id:'lunge',    name:'Fente / Lunge',      cat:'Squat',      muscles:['quad','glute','hip_flex'],    note:'Walking lunge, box step-up. Variant unilateral du squat. Utile pour diversifier la demande neuromusculaire basse chaine.'},
+  {id:'jump',     name:'Sauts / Pliometrie', cat:'Power',      muscles:['quad','glute','calf'],        note:'Box jump, broad jump, burpee. Forte composante de puissance. Fatigue locale rapide sur les mollets et genoux.'},
+];
+
+/* Interference matrix: which muscle groups clash */
+var MUSCLE_GROUPS = {
+  quad:['squat','lunge','jump'],
+  glute:['squat','hinge','lunge','jump'],
+  hamstring:['hinge'],
+  erector:['hinge','olympic'],
+  pec:['push_h'],
+  front_delt:['push_h','push_v','olympic'],
+  tricep:['push_h','push_v'],
+  lats:['pull_h','pull_v','olympic'],
+  bicep:['pull_h','pull_v'],
+  rhomboid:['pull_h'],
+  rear_delt:['pull_v'],
+  trap:['olympic','carry'],
+  core:['squat','core_flex','olympic','carry'],
+  hip_flexor:['core_flex','lunge'],
+  grip:['olympic','carry','pull_v','pull_h'],
+  full_body:['olympic'],
+  SNC:['olympic','jump'],
+  full_cardio:['mono'],
+  calf:['jump','mono'],
+  hip_flex:['lunge','core_flex'],
+};
+
+/* Format-specific pattern relevance */
+var FMT_PATTERNS = {
+  emom:     ['olympic','pull_v','push_v','hinge','squat','core_flex','mono'],
+  amrap:    ['squat','push_h','pull_v','mono','hinge','core_flex','jump','lunge'],
+  fortime:  ['squat','push_v','pull_v','hinge','mono','olympic','core_flex','jump'],
+  afap:     ['olympic','pull_v','push_v','jump','mono','hinge'],
+  intervals:['mono','hinge','squat','push_h','pull_v','core_flex','jump','carry'],
+  tabata:   ['mono','squat','push_h','pull_v','jump','core_flex'],
+  chipper:  ['squat','hinge','push_v','pull_v','mono','core_flex','jump','carry','lunge','push_h'],
+  buyin:    ['mono','hinge','squat','core_flex','carry'],
+  ladder:   ['squat','push_v','hinge','pull_v','olympic','push_h','mono'],
+};
+
+/* Format-specific combination suggestions */
+var FMT_COMBOS = {
+  emom: [
+    {title:'Technique haltero + gainage',patterns:['olympic','core_flex'],level:'rec',why:'L\'EMOM donne le temps de recuperation neuromusculaire necessaire apres chaque serie haltero. Le gainage en minute alternee ne fatigue pas les patterns olympiques.'},
+    {title:'Poussee verticale + traction verticale',patterns:['push_v','pull_v'],level:'rec',why:'Couplet antagoniste classique en EMOM. Les muscles agonistes recuperent pendant le travail de l antagoniste. Ideal pour le volume gymnastics.'},
+    {title:'Haltero + mono-structural',patterns:['olympic','mono'],level:'adv',why:'Le cardio en minute paire maintient l elevation du rythme cardiaque sans charger le SNC. Simule les conditions de competition.'},
+    {title:'Hinge lourd + traction verticale',patterns:['hinge','pull_v'],level:'rec',why:'Chaine posterieure + grand dorsal. Pas d interference directe. EMOM limite le volume hinge et preserves la technique.'},
+  ],
+  amrap: [
+    {title:'Squat + push + pull (triplet)',patterns:['squat','push_h','pull_v'],level:'rec',why:'Le triplet classique CrossFit (Air Squat + Push-Up + Pull-Up = Cindy). Interference minimale, effort continu possible. Gestion d allure sur 20 min.'},
+    {title:'Mono + squat (couplet)',patterns:['mono','squat'],level:'rec',why:'Box Jump / Row + Squat. Le cardio maintient la FC elevee, le squat cree la demande musculaire locale. Peu d interference croisee.'},
+    {title:'Hinge + push vertical + mono',patterns:['hinge','push_v','mono'],level:'adv',why:'Deadlift + HSPU + Run. Demande elevee sur la chaine posterieure et les epaules. Attention a la fatigue lombaire cumulative.'},
+    {title:'Squat + core + mono',patterns:['squat','core_flex','mono'],level:'rec',why:'Thruster ou Wall Ball + T2B + Row/Run. Volume modere par pattern, fatigabilite croisee limitee. Bon equilibre intensite/duree.'},
+  ],
+  fortime: [
+    {title:'Squat + pull vertical (21-15-9)',patterns:['squat','pull_v'],level:'rec',why:'Structure Fran (Thruster + Pull-Up) ou Karen + C2B. Le couplet 21-15-9 est calibre pour 3-8 min. Interference minimale.'},
+    {title:'Hinge + push vertical (Diane)',patterns:['hinge','push_v'],level:'rec',why:'Deadlift + HSPU. La chaine posterieure et les epaules ne partagent pas de muscles primaires. Effort court et intense possible.'},
+    {title:'Olympic + mono',patterns:['olympic','mono'],level:'adv',why:'Grace (30 Clean & Jerk AFAP) ou structure Run/Haltero. Necessite une base technique solide sous fatigue metabolique.'},
+    {title:'Squat + push + hinge (triplet)',patterns:['squat','push_h','hinge'],level:'adv',why:'Thruster + Burpee + KB Swing par exemple. Triple demande metabolique. Duree cible 8-15 min pour maintenir l intensite.'},
+  ],
+  afap: [
+    {title:'Olympic + pull vertical',patterns:['olympic','pull_v'],level:'adv',why:'Power Clean + Bar Muscle-Up ou Snatch + C2B. Effort maximal court (5-10 min). Necessite une technique solide sous pression.'},
+    {title:'Hinge + push vertical',patterns:['hinge','push_v'],level:'rec',why:'KB Swing + HSPU ou Deadlift + Push Press. Effort explosif, aucune interference directe. Adapte a 4-8 min AFAP.'},
+    {title:'Mono + jump',patterns:['mono','jump'],level:'rec',why:'Bike sprint + Box Jumps ou Ski + Burpees. Demande cardiovasculaire maximale. Couplet simple pour un effort pur de puissance aerobie.'},
+  ],
+  intervals: [
+    {title:'Mono + hinge (antagoniste metabolique)',patterns:['mono','hinge'],level:'rec',why:'Bike/Row + KB Swing. Le mono cree la dette d oxygene, le hinge cible la chaine posterieure. Zero interference musculaire directe.'},
+    {title:'Push horizontal + pull vertical (antagoniste strict)',patterns:['push_h','pull_v'],level:'rec',why:'Push-Up + Pull-Up en alternance. Antagonistes parfaits. Le muscle qui pousse recupere pendant que l autre tire. Intensite maintenue.'},
+    {title:'Mono + squat + core',patterns:['mono','squat','core_flex'],level:'rec',why:'Assault Bike + Wall Ball + T2B. Trois patterns sans interference majeure. Ideal pour les intervals metaboliques 40/20 ou 30/30.'},
+    {title:'Olympic + mono (competition)',patterns:['olympic','mono'],level:'adv',why:'Barbell cycling + Row/Bike. Simule les WODs Open : technique sous dette d oxygene. Ratio 1:1 minimum pour recuperation SNC.'},
+    {title:'Carry + mono',patterns:['carry','mono'],level:'rec',why:'Farmer Carry + Run ou Sled Push + Ski. Demande force fonctionnelle + cardiovasculaire. Interference nulle. Format Strongman-CrossFit.'},
+  ],
+  tabata: [
+    {title:'Mono seul (protocole pur)',patterns:['mono'],level:'rec',why:'Tabata Row ou Bike. Le plus proche du protocole Tabata original. Intensite verifiable, pas de degradation technique.'},
+    {title:'Squat seul',patterns:['squat'],level:'rec',why:'Tabata Air Squat. Simple, efficace. Attention : la fatigue locale sur les quads est extreme au round 7-8. Score = round le plus bas.'},
+    {title:'Push + pull (Tabata double)',patterns:['push_h','pull_v'],level:'adv',why:'4 rounds push-up / 4 rounds pull-up. Mouvements alternes, recuperation partielle entre patterns. Intensite maintenue sur 8 min total.'},
+  ],
+  chipper: [
+    {title:'Squat + hinge + push + pull + mono (full body)',patterns:['squat','hinge','push_v','pull_v','mono'],level:'rec',why:'Combinaison classique chipper : chaque pattern sollicite un groupe musculaire distinct. Fatigue locale sequentielle, pas de surcharge croisee. Duree 20-30 min.'},
+    {title:'Mono + jump + squat + core + pull (capacite)',patterns:['mono','jump','squat','core_flex','pull_v'],level:'rec',why:'Run + Box Jump + Thruster + T2B + Pull-Up. Charge cardiovasculaire elevee avec variation musculaire. Evite la surcharge sur un seul pattern.'},
+    {title:'Olympic + pull + push + hinge + mono (avance)',patterns:['olympic','pull_v','push_v','hinge','mono'],level:'adv',why:'Snatch + C2B + HSPU + Deadlift + Row. Chipper technique et lourd. Mouvements techniques EN PREMIER, mono en dernier pour finir sur un effort pur.'},
+    {title:'Carry + hinge + squat + mono',patterns:['carry','hinge','squat','mono'],level:'rec',why:'Structure Strongman-CrossFit. Yoke + Deadlift + Squat + Run. Demande force fonctionnelle sur chaine complete + effort cardio final.'},
+  ],
+  buyin: [
+    {title:'Mono buy-in + corps WOD',patterns:['mono','squat','pull_v'],level:'rec',why:'Run 400m ou Row 500m avant un AMRAP squat/pull. La pre-fatigue cardio modifie les conditions du WOD sans charger les patterns musculaires du coeur de seance.'},
+    {title:'Core cash-out + WOD principal',patterns:['core_flex','hinge','mono'],level:'rec',why:'WOD hinge/cardio + L-Sit ou GHD cash-out. Le core n interfere pas avec le WOD. Accumulation de volume gainage sans impacter la performance principale.'},
+    {title:'Olympic buy-in leger + WOD gymnastics',patterns:['olympic','pull_v','push_v'],level:'adv',why:'3 Squat Clean @ 70% buy-in + AMRAP gymnastics. Active le SNC et la chaine anterieure avant le travail au poids de corps.'},
+  ],
+  ladder: [
+    {title:'Squat + pull (21-15-9 classique)',patterns:['squat','pull_v'],level:'rec',why:'Thruster + Pull-Up (Fran). La structure descendante permet d accelerer sur les sets de 15 et 9. Couplet antagoniste sans interference.'},
+    {title:'Hinge + push vertical (Diane)',patterns:['hinge','push_v'],level:'rec',why:'Deadlift + HSPU (Diane). Chaine posterieure + deltoide anterieur. Aucune interference. L athlète peut accelerer quand le volume baisse.'},
+    {title:'Squat + push + pull (triplet montant)',patterns:['squat','push_h','pull_v'],level:'adv',why:'Ladder montante sur triplet. Demande physique et psychologique croissante. Prevois 60-70% de ton max sur chaque pattern pour tenir la progression.'},
+    {title:'Olympic + mono (pyramide)',patterns:['olympic','mono'],level:'adv',why:'Clean & Jerk + Cal Bike en pyramide. Le mono recupere le SNC entre les sets haltero. Structure forte pour competition simulation.'},
+  ],
+};
+
+/* Format-specific annotated example for panel C */
+var FMT_ANNOTATED = {
+  amrap: {
+    wod: 'AMRAP 20 min — "Cindy"<br>5 Pull-Ups<br>10 Push-Ups<br>15 Air Squats',
+    patterns: [
+      {name:'Pull vertical',tag:'Pull-Up — grand dorsal + bicep',why:'5 reps par round = volume bas par passage, ce qui permet de les faire unbroken longtemps. Sur 20 rounds, ca fait 100 pull-ups. La gestion de la fragmentation (quand passer de unbroken a 3+2 ou 5x1) est la decision tactique principale.'},
+      {name:'Poussee horizontale',tag:'Push-Up — pec + deltoide avant + tricep',why:'10 reps, le double des pull-ups. Les push-ups sont choisis car ils sollicitent les antagonistes du pull (pec vs grand dorsal), ce qui permet une recuperation partielle. Le ratio 5/10/15 n est pas arbitraire : il equilIbre le temps par pattern sur chaque round.'},
+      {name:'Squat',tag:'Air Squat — quad + fessier',why:'15 reps, le triple des pull-ups. L air squat est le pattern le moins limitant de Cindy — les jambes cedent rarement avant le buste superieur. Son role : maintenir la FC elevee entre les deux patterns de buste. Il sert de "recuperation active" du buste tout en maintenant la charge cardiovasculaire.'},
+    ],
+    logic: 'Logique de conception : triplet antagoniste parfait. Pull vertical + push horizontal + squat = trois groupes musculaires sans aucune interference directe. Le ratio 5-10-15 cree un equilibre de temps par pattern (environ 15s/20s/20s). La cle de Cindy est la gestion des transitions et la fragmentation du pull-up : c est toujours le buste superieur qui cede en premier.'
+  },
+  fortime: {
+    wod: 'For Time — "Fran"<br>21-15-9<br>Thrusters (42,5/30 kg)<br>Pull-Ups',
+    patterns: [
+      {name:'Squat + Poussee verticale',tag:'Thruster — squat frontal + push press',why:'Le Thruster est le mouvement le plus physiologiquement exigeant du CrossFit : il combine un squat frontal (quad + fessier) avec un push press (deltoide + tricep) en un seul mouvement continu. 21 reps en premier set = effort quasi-maximal. Les 42,5 kg sont calibres pour etre lourds mais executables unbroken au moins sur les 9 (voire les 15).'},
+      {name:'Pull vertical',tag:'Pull-Up — grand dorsal + bicep',why:'Antagoniste quasi-parfait du Thruster : les muscles primaires (grand dorsal, bicep) ne sont pas sollicites par le thruster. La fatigue est surtout cardiovasculaire et respiratoire, pas locale. C est pour ca que Fran peut etre fait en sous 3 minutes par les athletes d elite : les muscles recuperent pendant que le cardio encaisse.'},
+    ],
+    logic: 'Logique de conception : Fran est le benchmark CrossFit le plus pur. Deux patterns, interference quasi nulle, structure descendante 21-15-9. La limite n est pas musculaire — c est la capacite a maintenir l intensite respiratoire. Les splits tactiques standard : 15-6/9-6 sur les thrusters du set de 21, unbroken sur 15 et 9. Ne pas partir unbroken sur 21 thrusters si tu n es pas sub-3min capable.'
+  },
+  afap: {
+    wod: 'AFAP — 10 rounds<br>3 Power Snatch @ 60% 1RM<br>6 Bar Muscle-Ups',
+    patterns: [
+      {name:'Haltero olympique',tag:'Power Snatch — chaine posterieure + extension explosive',why:'3 reps par round a 60% = charge technique mais non maximale. L objectif AFAP impose de ne jamais poser la barre entre les 3 reps. Le Power Snatch recrute la chaine posterieure complete + extension de cheville + stabilite d epaule en reception. Sur 10 rounds, ca represente 30 reps de snatch sous fatigue progressive : la technique de la reception va etre testee au round 8-10.'},
+      {name:'Pull vertical + Poussee verticale',tag:'Bar Muscle-Up — pull + transition + dip',why:'Le BMU cumule deux patterns en un seul mouvement : traction verticale (grand dorsal + bicep) + transition explosive + dip (tricep + pec). 6 reps x 10 rounds = 60 BMU. La pre-fatigue du snatch (trapezes, avant-bras, prise) va impacter la qualite de la traction. C est le pattern qui va ceder en premier : prevois de passer en singles des le round 6-7 si tu n as pas un kipping solide.'},
+    ],
+    logic: 'Logique de conception : couplet technique pour effort AFAP court (8-12 min cible). Le snatch et le BMU partagent une demande sur les trapezes et la prise, ce qui en fait une interference moderee — acceptable sur faible volume (3 reps snatch). L objectif AFAP est de maintenir le meme rythme du round 1 au round 10 : si le round 10 prend 30s de plus que le round 1, l intensite initiale etait trop elevee.'
+  },
+  emom: {
+    wod: 'E2MOM x 20 min (10 rounds)<br>Min 0-1 : 3 Power Clean @ 72% 1RM<br>Min 2-3 : 8 Chest-to-Bar Pull-Ups',
+    patterns: [
+      {name:'Olympic',tag:'Haltero olympique',why:'Le Power Clean recrute la chaine posterieure complete (hinge) + extension explosive + reception en squat partiel. En E2MOM, les 90-100s de repos permettent une recuperation neuromusculaire suffisante pour maintenir la technique sur 10 rounds.'},
+      {name:'Pull vertical',tag:'Traction verticale',why:'Le C2B en minute impaire ne partage aucun muscle primaire avec le Power Clean (grand dorsal + bicep vs chaine posterieure + trapezes). L alternance evite la surcharge et permet un volume gymnastics significatif.'},
+    ],
+    logic: 'Logique de conception : antagonisme inter-minutes. Le SNC recupere sur le travail gymnastic pendant que la chaine posterieure recupere sur l haltero. Volume total = 30 Power Cleans + 80 C2B en 20 min — impossible sans la structure EMOM.'
+  },
+  amrap: {
+    wod: 'AMRAP 20 min<br>5 Pull-Ups<br>10 Push-Ups<br>15 Air Squats<br>(Benchmark "Cindy")',
+    patterns: [
+      {name:'Pull vertical',tag:'Traction verticale',why:'5 reps seulement par round : volume modere qui permet de maintenir des series non-stop sur 20 min. Le grand dorsal est le premier pattern a ceder — surveille la fragmentation comme indicateur d intensite.'},
+      {name:'Poussee horizontale',tag:'Push horizontal',why:'10 Push-Ups : antagoniste du pull-up. Pendant que les dorsaux recuperent, les pectoraux/triceps travaillent. L alternance push/pull est la cle de la longevite sur 20 min.'},
+      {name:'Squat',tag:'Squat',why:'15 Air Squats : volume de squat eleve mais charge nulle. Permet de maintenir le rythme cardiaque pendant que les membres superieurs recuperent. Le squat est ici le "repos actif" du triplet.'},
+    ],
+    logic: 'Logique de conception : 3 patterns sans interference directe, volumes croissants (5/10/15) pour equilibrer le temps par pattern. Le squat etant moins limitant que le pull/push, son volume plus eleve equidistribue l effort total. C est pourquoi Cindy tient 20 min sans effondrement complet.'
+  },
+  fortime: {
+    wod: 'For Time — 21-15-9<br>Thrusters (42,5/30 kg)<br>Pull-Ups<br>(Benchmark "Fran")',
+    patterns: [
+      {name:'Squat + Poussee verticale',tag:'Thruster = squat + push vertical',why:'Le Thruster est un squat frontal suivi d un push press : il combine deux patterns en un mouvement. Cela maximise la densite metabolique sur un seul exercice. La fatigue vient des quads ET des epaules simultanement — c est ce qui rend Fran si exigeant.'},
+      {name:'Pull vertical',tag:'Traction verticale',why:'Le Pull-Up est l antagoniste du push press (grand dorsal vs deltoide anterieur). Pendant les pull-ups, les epaules recuperent du push. La structure 21-15-9 donne 45 thrusters + 45 pull-ups — calibre pour 3-5 min a intensite maximale.'},
+    ],
+    logic: 'Logique de conception : Fran est un couplet 21-15-9 entre un mouvement compose (thruster) et son antagoniste vertical (pull-up). L absence d interference directe entre les deux permet un effort quasi-maximal sans recuperation. La structure descendante autorise l acceleration : si tu parts non-stop sur les 21 et tu tiens, tu peux finir les 15 et 9 unbroken.'
+  },
+  afap: {
+    wod: 'AFAP — 10 rounds<br>3 Power Snatch @ 60% 1RM<br>6 Bar Muscle-Ups',
+    patterns: [
+      {name:'Haltero olympique',tag:'Olympic',why:'Le Power Snatch a 60% : assez lourd pour imposer la technique, assez leger pour du barbell cycling. 3 reps par round = 30 snatches totaux. La charge SNC est maximale sur les premiers rounds — si la technique se degrade, la charge est trop lourde.'},
+      {name:'Pull vertical + Push vertical',tag:'Bar Muscle-Up = pull + transition + push',why:'Le BMU recrute d abord le grand dorsal (pull), puis une transition explosive (full_body), puis les triceps/pec en dip (push). Il cumule deux patterns en un. 6 BMU x 10 rounds = 60 repetitions de l un des mouvements les plus exigeants en CrossFit.'},
+    ],
+    logic: 'Logique de conception : couplet technique pour effort court AFAP. Le snatch active la chaine posterieure + SNC, le BMU active le buste + pushing. Interference quasi nulle entre les deux patterns. L objectif est de conserver la meme vitesse au round 10 qu au round 1 : si ce n est pas possible, diminue le volume ou la charge.'
+  },
+  intervals: {
+    wod: '8 rounds : 40s ON / 20s OFF<br>Rounds impairs : Assault Bike sprint<br>Rounds pairs : 10 KB Swings (24/16 kg)',
+    patterns: [
+      {name:'Mono-structural',tag:'Cardio pur',why:'L Assault Bike est le seul ergometre full body : bras + jambes. A intensite maximale (>80 RPM), il cree la dette d oxygene la plus rapide disponible en CrossFit. Il n interfere avec aucun pattern musculaire specifique.'},
+      {name:'Hinge',tag:'Hip hinge',why:'Le KB Swing est un hinge explosif : chaine posterieure (ischios, fessiers, erecteurs). En alternance avec le bike, les 20s de repos sur le bike permettent a la chaine posterieure de recuperer. Le ratio 2:1 = seuil lactique.'},
+    ],
+    logic: 'Logique de conception : alternance mono/hinge avec repos impose. Le bike ne fatigue pas les muscles du swing et vice versa. Le fait d alterner les patterns (pas les memes muscles deux fois de suite) permet de maintenir une intensite elevee sur 8 rounds. C est le principe des intervals metaboliques : zero interference = densite maximale.'
+  },
+  tabata: {
+    wod: 'Tabata Row<br>20s effort maximal / 10s repos x 8 rounds<br>Score = calorie la plus basse',
+    patterns: [
+      {name:'Mono-structural',tag:'Cardio pur — full body',why:'Le rowing est le seul mono-structural qui recrute jambes + dos + bras en une seule traction. Il permet une intensite superieure a 170% VO2max — ce que le protocole Tabata original exige. Sur 8 rounds, le score au round 7-8 est le vrai test : maintenir = bonne gestion, chute = parti trop vite.'},
+    ],
+    logic: 'Logique de conception : le Tabata pur utilise un seul pattern a intensite supramaximale. L introduction de plusieurs patterns dilue l intensite et ne reproduit pas l adaptation metabolique recherchee (developpement simultane VO2max + capacite anaerobie). Quand tu vois un "Tabata" avec 4 exercices differents, c est du travail de force-endurance — pas du Tabata au sens physiologique.'
+  },
+  chipper: {
+    wod: 'For Time<br>50 Wall Balls (9/6 kg)<br>40 Box Jumps (60/50 cm)<br>40 KB Swings (24/16 kg)<br>30 Hang Power Cleans (60/42,5 kg)<br>20 Handstand Push-Ups<br>10 Bar Muscle-Ups',
+    patterns: [
+      {name:'Squat',tag:'Wall Ball — squat + poussee',why:'Ouvre le chipper : quads frais, technique preservee. Le Wall Ball combine squat frontal + push overhead. 50 reps en premier = fatigue locale quad/epaule significative mais acceptable car non-technique.'},
+      {name:'Jump / Pliometrie',tag:'Box Jump — puissance basse chaine',why:'Apres les Wall Balls, les quads sont deja charges. Les Box Jumps ajoutent une composante pliometrique. C est le moment ou l athlete doit gerer : step-down plutot que rebond pour preserver les mollets.'},
+      {name:'Hinge',tag:'KB Swing — chaine posterieure',why:'Apres les deux patterns quad-dominants, le KB Swing sollicite la chaine posterieure (ischios, fessiers). Changement de demande musculaire = recuperation partielle des quads. Ordonnancement intelligent.'},
+      {name:'Haltero olympique',tag:'Hang Power Clean — chaine complete',why:'Le HPC au milieu du chipper : la chaine posterieure est deja chargee par les swings. Attention au bas du dos. Charge moderee (60 kg) choisie pour rester executable sous fatigue. Technique prioritaire ici.'},
+      {name:'Poussee verticale',tag:'HSPU — deltoide + tricep',why:'Apres 160 reps de membres inferieurs et hinge, les epaules arrivent relativement fraiches. 20 HSPU restent exigeants mais executables. Si les HSPU etaient en premier, tu pourrais en faire 20 unbroken — en milieu de chipper, prevois 10-6-4.'},
+      {name:'Pull vertical + Push vertical',tag:'Bar Muscle-Up — full body',why:'Ferme le chipper sur le mouvement le plus technique : volume minimal (10) pour rester executable sous fatigue systemique. Si les BMU etaient au milieu, 150 reps de fatigue precedente rendraient la transition impossible pour la majorite.'},
+    ],
+    logic: 'Logique de conception : 6 patterns distincts, zero interference directe entre consecutifs. L ordre suit le principe fatigue-locale-sequentielle : quad → puissance → chaine posterieure → chaine posterieure bis → epaule → full body. Chaque pattern laisse le precedent recuperer. C est la cle de l ordonnancement chipper.'
+  },
+  buyin: {
+    wod: 'Buy-In : Run 400m AFAP<br>Puis AMRAP 12 min :<br>8 Deadlifts (100/70 kg)<br>8 Box Jumps (60/50 cm)<br>8 Chest-to-Bar Pull-Ups<br>Cash-Out : 3 x Max Hold L-Sit',
+    patterns: [
+      {name:'Mono-structural',tag:'Buy-In — Run 400m',why:'Le run cree une pre-fatigue cardiovasculaire sans charger les patterns musculaires du WOD central (hinge + jump + pull). L athlete aborde l AMRAP avec une FC elevee et une dette d oxygene partielle — condition de competition.'},
+      {name:'Hinge',tag:'Deadlift — chaine posterieure',why:'Premier pattern du WOD central. A 100 kg, la demande neuromusculaire est elevee. La pre-fatigue cardio du run ne compromet pas la force de hinge — mais elle accelere la fatigue systemique sur la duree de l AMRAP.'},
+      {name:'Jump',tag:'Box Jump — puissance basse chaine',why:'Antagoniste metabolique du deadlift : les ischios recuperent pendant que les quads s activent sur le saut. Le Box Jump maintient la FC elevee sans surcharger la chaine posterieure.'},
+      {name:'Pull vertical',tag:'C2B — traction verticale',why:'Troisieme pattern, le seul a solliciter le buste superieur. Arrivant apres hinge et jump, les dorsaux sont relativement frais. C est le pattern qui va ceder en dernier — ou en premier si l athlete n a pas de C2B solide.'},
+      {name:'Gainage / Core',tag:'Cash-Out — L-Sit',why:'Le L-Sit cible le gainage isometrique et les flechisseurs de hanche. Il n interfere avec aucun des patterns du WOD central. Cash-out ideal : volume accessoire cible qui s accumule sans impacter la performance principale.'},
+    ],
+    logic: 'Logique de conception : le Buy-In modifie les conditions sans detruire les patterns. Le Cash-Out accumule un volume cible impossible a inclure dans le WOD principal sans le denaturer. Les 3 patterns de l AMRAP central sont non-interferents et couvrent chaine posterieure + puissance + buste superieur.'
+  },
+  ladder: {
+    wod: 'For Time — 21-15-9<br>Deadlifts (102,5/70 kg)<br>Handstand Push-Ups<br>(Benchmark "Diane")',
+    patterns: [
+      {name:'Hinge',tag:'Deadlift — chaine posterieure',why:'21 Deadlifts a 102,5 kg : effort intense de chaine posterieure. En ladder descendante, le volume baisse quand la fatigue augmente. Les 21 sont les plus difficiles — prevois 12-9 ou 15-6. Les 15 et 9 deviennent executables unbroken si tu as gere le premier set.'},
+      {name:'Poussee verticale',tag:'HSPU — deltoide + tricep',why:'Antagoniste du deadlift : grand dorsal/ischios vs deltoide anterieur/tricep. Zero interference directe. Pendant les HSPU, la chaine posterieure recupere du deadlift. C est ce qui rend Diane possible comme effort quasi-maximal.'},
+    ],
+    logic: 'Logique de conception : Diane est l exemple parfait du couplet 21-15-9 bien construit. Deux patterns sans aucune interference musculaire directe. L alternance deadlift/HSPU permet a chaque groupe musculaire de recuperer pendant que l autre travaille. La structure descendante autorise l acceleration : si tu survis aux 21 deadlifts, les 15 et 9 passent vite.'
+  },
+};
+
+/* Format info data */
+var FMT_INFO = {
+  emom:     {name:'EMOM',     tag:'Every Minute On the Minute',     desc:"A chaque debut de minute, l'athlete execute un bloc de travail defini. Le temps restant constitue la recuperation passive. Plus l'effort est rapide, plus la recuperation est longue. Ce format permet de controler la densite d'entrainement et d'exposer l'athlete a la technique sous fatigue moderee et reproductible. Ideal pour la force-endurance, la technique haltero ou gymnastics.", example:"<span class='wt'>E1MOM x 16 min</span>Min impaires : 3 Clean &amp; Jerk @ 70% 1RM<br>Min paires : 10 Toes-to-Bar<br><span class='wp'>Olympic</span><span class='wp'>Core</span><span class='wnote'>Objectif : maintenir la qualite technique sur chaque serie. Si la barre tombe ou que les T2B se fragmentent, c'est le signal que la charge est trop elevee.</span>"},
+  amrap:    {name:'AMRAP',    tag:'As Many Rounds As Possible',     desc:"L'athlete repete un circuit d'exercices en continu pendant une duree fixee. Pas de repos impose : l'athlete gere son allure. Un AMRAP court (5-8 min) est a dominante anaerobie. Un AMRAP long (15-25 min) devient un travail aerobie et de gestion du rythme. Le score est objectif et reproductible.", example:"<span class='wt'>AMRAP 20 min — Cindy</span>5 Pull-Ups / 10 Push-Ups / 15 Air Squats<br><span class='wp'>Pull vertical</span><span class='wp'>Push horizontal</span><span class='wp'>Squat</span><span class='wnote'>3 patterns non-interferents. Volume croissant (5-10-15) pour equilibrer le temps par pattern. Un bon Level 2 vise 20+ rounds.</span>"},
+  fortime:  {name:'For Time', tag:'Score = temps sur volume fixe',  desc:"Un volume de travail precis est fixe. L'athlete le complete le plus vite possible. Le temps est le score. Ce format mesure la performance absolue et permet un suivi precis de la progression. La duree cible : 4 a 20 minutes.", example:"<span class='wt'>For Time — Fran</span>21-15-9 : Thrusters (42,5/30 kg) + Pull-Ups<br><span class='wp'>Squat + Push vertical</span><span class='wp'>Pull vertical</span><span class='wnote'>Couplet antagoniste. Elite : sub 3 min. Level 2 : sub 5 min. Le transitoire barre/barre de traction est la variable cle.</span>"},
+  afap:     {name:'AFAP',     tag:'As Fast As Possible',            desc:"Identique au For Time dans sa structure, mais la notion d'effort maximal est explicitement au coeur du format. AFAP signale qu'aucun pacing n'est acceptable. Utilise pour des efforts courts et intenses (4-12 min) favorisant la puissance.", example:"<span class='wt'>AFAP — 10 rounds</span>3 Power Snatch @ 60% + 6 Bar Muscle-Ups<br><span class='wp'>Olympic</span><span class='wp'>Pull+Push vertical</span><span class='wnote'>Effort court explosif. Objectif : meme vitesse au round 10 qu'au round 1. Si impossible, charge trop lourde.</span>"},
+  intervals:{name:'Intervals', tag:'Travail / Repos a ratio fixe',  desc:"Des periodes de travail et de repos sont alternees selon un ratio predetermine. Le ratio T:R est le levier physiologique principal : 1:3 = puissance anaerobie, 1:1 = seuil lactique, 2:1 = endurance musculaire. Tres polyvalent si le ratio est correctement calibre.", example:"<span class='wt'>8 rounds : 40s ON / 20s OFF</span>Rounds impairs : Assault Bike / Rounds pairs : 10 KB Swings (24/16 kg)<br><span class='wp'>Mono-structural</span><span class='wp'>Hinge</span><span class='wnote'>Ratio 2:1 = seuil lactique. Alternance mono/hinge = zero interference. Score = calories bike cumulees.</span>"},
+  tabata:   {name:'Tabata',   tag:'20s effort / 10s repos x 8',     desc:"Protocole Tabata (1996) : 8 rounds de 20s d'effort supramaximal / 10s repos = 4 minutes. L'intensite originale requise depasse 170% du VO2max. Utilise des mouvements a faible charge cognitive. Indicateur : maintien du score entre le premier et le dernier round.", example:"<span class='wt'>Tabata Row</span>20s effort maximal / 10s repos x 8 rounds<br><span class='wp'>Mono-structural</span><span class='wnote'>Score = calorie la plus basse. Regularite maximale entre rounds. Evite les mouvements techniques complexes.</span>"},
+  chipper:  {name:'Chipper',  tag:'Liste de mouvements en passage unique', desc:"Une liste de mouvements distincts (4-7) completee dans l'ordre, volume fixe par mouvement, en un seul passage. La fatigue est sequentielle et locale. L'ordonnancement des mouvements est une variable de conception critique : les mouvements techniques en premier.", example:"<span class='wt'>Chipper For Time</span>50 Wall Balls / 40 Box Jumps / 30 HPC / 20 HSPU / 10 BMU<br><span class='wp'>Squat</span><span class='wp'>Jump</span><span class='wp'>Olympic</span><span class='wp'>Push vertical</span><span class='wp'>Pull+Push</span><span class='wnote'>5 patterns distincts. Fatigue locale sequentielle. HSPU et BMU en fin = faible volume executables sous fatigue systemique.</span>"},
+  buyin:    {name:'Buy-In/Out',tag:'Effort peripherique + WOD central', desc:"Un Buy-In est un effort fixe avant le WOD central. Un Cash-Out est un effort fixe apres. Le Buy-In cree une pre-fatigue qui simule les conditions de competition. Le Cash-Out accumule un volume accessoire sans denaturer le WOD principal.", example:"<span class='wt'>Buy-In : Run 400m | AMRAP 12 min : 8 DL + 8 BJ + 8 C2B | Cash-Out : L-Sit</span><br><span class='wp'>Mono</span><span class='wp'>Hinge</span><span class='wp'>Jump</span><span class='wp'>Pull vertical</span><span class='wp'>Core</span><span class='wnote'>Le run pre-fatigue le cardio sans charger les patterns du WOD. Le L-Sit n'interfere avec rien.</span>"},
+  ladder:   {name:'Ladder',   tag:'Volume croissant, decroissant ou pyramide', desc:"Le volume varie a chaque round. Descendante (21-15-9) : volume baisse quand la fatigue monte, permettant l'acceleration. Montante : pression croissante. Pyramide : combine les deux. Le schema 21-15-9 est le plus iconique en CrossFit.", example:"<span class='wt'>For Time — Diane</span>21-15-9 : Deadlifts (102,5/70 kg) + HSPU<br><span class='wp'>Hinge</span><span class='wp'>Push vertical</span><span class='wnote'>Couplet antagoniste parfait. Elite : sub 2 min. Level 2 : sub 5 min. Fragmente les 21 HSPU intelligemment.</span>"},
+};
+
+/* ===== UI FUNCTIONS ===== */
 
 function setFmt(fmt) {
   currentFmt = fmt;
+  checkedPatterns = [];
+
   var btns = document.querySelectorAll('.fmt-btn');
   for (var i = 0; i < btns.length; i++) {
-    if (btns[i].getAttribute('data-fmt') === fmt) {
-      btns[i].classList.add('active');
-    } else {
-      btns[i].classList.remove('active');
-    }
+    btns[i].classList.toggle('active', btns[i].getAttribute('data-fmt') === fmt);
   }
+
   var condIds = ['emom-extra','intervals-extra','chipper-extra','buyin-extra','ladder-extra'];
-  for (var j = 0; j < condIds.length; j++) {
-    document.getElementById(condIds[j]).classList.remove('show');
-  }
-  if (fmt === 'emom')      { document.getElementById('emom-extra').classList.add('show'); }
-  if (fmt === 'intervals') { document.getElementById('intervals-extra').classList.add('show'); }
-  if (fmt === 'chipper')   { document.getElementById('chipper-extra').classList.add('show'); }
-  if (fmt === 'buyin')     { document.getElementById('buyin-extra').classList.add('show'); }
-  if (fmt === 'ladder')    { document.getElementById('ladder-extra').classList.add('show'); }
-  document.getElementById('interval-field').style.display = (fmt === 'emom') ? '' : 'none';
+  for (var j = 0; j < condIds.length; j++) { document.getElementById(condIds[j]).classList.remove('show'); }
+  if (fmt==='emom')      document.getElementById('emom-extra').classList.add('show');
+  if (fmt==='intervals') document.getElementById('intervals-extra').classList.add('show');
+  if (fmt==='chipper')   document.getElementById('chipper-extra').classList.add('show');
+  if (fmt==='buyin')     document.getElementById('buyin-extra').classList.add('show');
+  if (fmt==='ladder')    document.getElementById('ladder-extra').classList.add('show');
+
+  document.getElementById('interval-field').style.display = (fmt==='emom') ? '' : 'none';
   var dr = document.getElementById('dur-row');
-  dr.style.opacity = (fmt === 'tabata') ? '0.3' : '';
-  dr.style.pointerEvents = (fmt === 'tabata') ? 'none' : '';
+  dr.style.opacity = (fmt==='tabata') ? '0.3' : '';
+  dr.style.pointerEvents = (fmt==='tabata') ? 'none' : '';
+
+  var info = FMT_INFO[fmt];
+  if (info) {
+    document.getElementById('fi-name').textContent = info.name;
+    document.getElementById('fi-tag').textContent  = info.tag;
+    document.getElementById('fi-desc').textContent = info.desc;
+    document.getElementById('fi-example').innerHTML = info.example;
+  }
+
+  if (currentTab) openTab(currentTab);
   calc();
 }
 
-function calc() {
-  var fmt      = currentFmt;
-  var dur      = parseInt(document.getElementById('duration').value) || 20;
-  var energy   = document.getElementById('energy').value;
-  var movement = document.getElementById('movement').value;
-  var tgt      = TARGETS[energy];
-  var workTotal = 0;
-  var restTotal = 0;
-  var ratio = null;
-  var rounds = 0;
-  var formatDesc = '';
+function openTab(tab) {
+  currentTab = tab;
+  var panels = ['a','b','c'];
+  for (var i = 0; i < panels.length; i++) {
+    document.getElementById('tab-'+panels[i]).classList.toggle('active', panels[i]===tab);
+    document.getElementById('panel-'+panels[i]).classList.toggle('show', panels[i]===tab);
+  }
+  if (tab==='a') renderPatternFilter();
+  if (tab==='b') renderCombos();
+  if (tab==='c') renderAnnotated();
+}
 
-  if (fmt === 'emom') {
-    var ws = parseInt(document.getElementById('work-s').value) || 35;
-    var intv = parseInt(document.getElementById('interval').value) || 1;
-    var intv_s = intv * 60;
-    var rest_s = intv_s - ws;
-    if (rest_s <= 0) {
-      document.getElementById('messages').innerHTML = '<div class="msg bad">La duree de travail depasse l intervalle. Reduis le travail ou augmente l intervalle.</div>';
-      return;
+/* ---- OPTION A : pattern filter ---- */
+function renderPatternFilter() {
+  var fmt = currentFmt;
+  var relevant = FMT_PATTERNS[fmt] || [];
+  var html = '';
+  for (var i = 0; i < ALL_PATTERNS.length; i++) {
+    var p = ALL_PATTERNS[i];
+    var isRelevant = (relevant.indexOf(p.id) !== -1);
+    var isChecked  = (checkedPatterns.indexOf(p.id) !== -1);
+    var cls = 'pat-item';
+    if (isChecked) cls += ' checked';
+    if (!isRelevant) cls += ' incompatible';
+    html += '<div class="'+cls+'" onclick="togglePattern(\''+p.id+'\')" id="pi-'+p.id+'">';
+    html += '<div class="pat-cb">'+(isChecked?'v':'')+'</div>';
+    html += '<div class="pat-info">';
+    html += '<div class="pat-name">'+p.name+'<span class="pat-tag">'+p.cat+'</span></div>';
+    html += '<div class="pat-why">'+p.note+(isRelevant?' — <strong style="color:var(--accent-dim);filter:brightness(1.5)">Recommande pour ce format</strong>':'')+'</div>';
+    html += '</div></div>';
+  }
+  document.getElementById('pat-list').innerHTML = html;
+  renderInterference();
+}
+
+function togglePattern(id) {
+  var idx = checkedPatterns.indexOf(id);
+  if (idx === -1) { checkedPatterns.push(id); }
+  else { checkedPatterns.splice(idx, 1); }
+  renderPatternFilter();
+}
+
+function renderInterference() {
+  var el = document.getElementById('pat-interference');
+  var body = document.getElementById('pat-interference-body');
+  if (checkedPatterns.length < 2) { el.style.display='none'; return; }
+  el.style.display='block';
+
+  var conflicts = [];
+  for (var i = 0; i < checkedPatterns.length; i++) {
+    for (var j = i+1; j < checkedPatterns.length; j++) {
+      var pA = getPattern(checkedPatterns[i]);
+      var pB = getPattern(checkedPatterns[j]);
+      if (!pA || !pB) continue;
+      var shared = [];
+      for (var m = 0; m < pA.muscles.length; m++) {
+        if (pB.muscles.indexOf(pA.muscles[m]) !== -1) shared.push(pA.muscles[m]);
+      }
+      if (shared.length > 0) {
+        conflicts.push({a:pA.name, b:pB.name, muscles:shared});
+      }
     }
-    rounds = Math.floor((dur * 60) / intv_s);
-    workTotal = Math.round(rounds * ws / 60 * 10) / 10;
-    restTotal = Math.round(rounds * rest_s / 60 * 10) / 10;
-    ratio = Math.round((ws / rest_s) * 100) / 100;
-    formatDesc = rounds + ' rounds x ' + ws + 's travail / ' + rest_s + 's repos';
+  }
 
-  } else if (fmt === 'tabata') {
-    workTotal = 2.7;
-    restTotal = 1.3;
-    ratio = 2;
-    rounds = 8;
-    formatDesc = '8 rounds x 20s / 10s -- 4 min fixe';
+  var html = '';
+  if (conflicts.length === 0) {
+    html = '<div class="msg ok" style="font-size:12px">Aucune interference detectee entre les patterns selectionnes. Combinaison coherente pour ce format.</div>';
+  } else {
+    for (var k = 0; k < conflicts.length; k++) {
+      var c = conflicts[k];
+      var severity = c.muscles.length >= 2 ? 'bad' : 'warn';
+      html += '<div class="msg '+severity+'" style="font-size:12px;margin-bottom:4px"><strong>'+c.a+' / '+c.b+'</strong> : muscles partages — '+c.muscles.join(', ')+'. '+(severity==='bad' ? 'Interference elevee : evite de les mettre en consecutif ou le meme jour.' : 'Interference moderee : gerable avec un ratio T:R suffisant.')+'</div>';
+    }
+  }
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">Patterns selectionnes : '+checkedPatterns.map(function(id){var p=getPattern(id);return p?p.name:id;}).join(' + ')+'</div>';
+  body.innerHTML = html;
+}
 
-  } else if (fmt === 'amrap') {
-    workTotal = dur;
-    restTotal = 0;
-    rounds = 1;
-    formatDesc = dur + ' min continus -- score en rounds + reps';
+function getPattern(id) {
+  for (var i = 0; i < ALL_PATTERNS.length; i++) { if (ALL_PATTERNS[i].id===id) return ALL_PATTERNS[i]; }
+  return null;
+}
 
-  } else if (fmt === 'fortime') {
-    workTotal = dur;
-    restTotal = 0;
-    rounds = 1;
-    formatDesc = 'Volume fixe -- score en temps (estimation : ' + dur + ' min)';
+/* ---- OPTION B : combinations ---- */
+function renderCombos() {
+  var fmt = currentFmt;
+  var combos = FMT_COMBOS[fmt] || [];
+  var html = '';
+  if (combos.length === 0) {
+    html = '<div style="padding:14px;color:var(--muted);font-size:12px">Pas de combinaisons definies pour ce format.</div>';
+  } else {
+    for (var i = 0; i < combos.length; i++) {
+      var c = combos[i];
+      var cls = 'combo-card' + (c.level==='rec' ? ' recommended' : '');
+      var badge = c.level==='rec'
+        ? '<span class="combo-badge badge-rec">Recommande</span>'
+        : '<span class="combo-badge badge-adv">Avance</span>';
+      html += '<div class="'+cls+'">';
+      html += '<div class="combo-title">'+c.title+' '+badge+'</div>';
+      html += '<div class="combo-patterns">';
+      for (var j = 0; j < c.patterns.length; j++) {
+        var p = getPattern(c.patterns[j]);
+        html += '<span class="combo-pat">'+(p?p.name:c.patterns[j])+'</span>';
+      }
+      html += '</div>';
+      html += '<div class="combo-why">'+c.why+'</div>';
+      html += '</div>';
+    }
+  }
+  document.getElementById('combo-list').innerHTML = html;
+}
 
-  } else if (fmt === 'afap') {
-    workTotal = dur;
-    restTotal = 0;
-    rounds = 1;
-    formatDesc = 'Volume fixe -- effort maximal, score en temps';
+/* ---- OPTION C : annotated example ---- */
+function renderAnnotated() {
+  var fmt = currentFmt;
+  var data = FMT_ANNOTATED[fmt];
+  if (!data) {
+    document.getElementById('panel-c-content').innerHTML = '<span style="color:var(--muted);font-size:12px">Exemple annote non disponible pour ce format.</span>';
+    return;
+  }
+  var html = '<span class="wt">WOD</span>' + data.wod + '<br><br>';
+  html += '<span class="wt" style="color:var(--muted);font-size:10px;letter-spacing:.08em">PATTERNS MOBILISES</span>';
+  for (var i = 0; i < data.patterns.length; i++) {
+    var pat = data.patterns[i];
+    html += '<div style="margin-top:8px;padding:8px 10px;background:var(--bg4);border-radius:var(--r);border-left:2px solid var(--accent)">';
+    html += '<div style="font-family:var(--mono);font-size:10px;margin-bottom:3px"><span class="wp">'+pat.name+'</span> <span style="color:var(--muted)">'+pat.tag+'</span></div>';
+    html += '<div style="font-size:12px;color:var(--text);line-height:1.6">'+pat.why+'</div>';
+    html += '</div>';
+  }
+  html += '<div style="margin-top:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--r);border-left:2px solid var(--muted)">';
+  html += '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.08em;margin-bottom:4px">LOGIQUE DE CONCEPTION</div>';
+  html += '<div style="font-size:12px;color:var(--muted);line-height:1.6">'+data.logic+'</div>';
+  html += '</div>';
+  document.getElementById('panel-c-content').innerHTML = html;
+}
 
-  } else if (fmt === 'intervals') {
-    var iw = parseInt(document.getElementById('int-work').value) || 40;
-    var ir = parseInt(document.getElementById('int-rest').value) || 20;
-    var cycle = iw + ir;
-    rounds = Math.floor((dur * 60) / cycle);
-    workTotal = Math.round(rounds * iw / 60 * 10) / 10;
-    restTotal = Math.round(rounds * ir / 60 * 10) / 10;
-    ratio = Math.round((iw / ir) * 100) / 100;
-    formatDesc = rounds + ' rounds x ' + iw + 's travail / ' + ir + 's repos';
+/* ===== CALC FUNCTION ===== */
+function calc() {
+  var fmt=currentFmt, dur=parseInt(document.getElementById('duration').value)||20;
+  var energy=document.getElementById('energy').value, movement=document.getElementById('movement').value;
+  var tgt=TARGETS[energy], workTotal=0, restTotal=0, ratio=null, rounds=0, formatDesc='';
 
-  } else if (fmt === 'chipper') {
-    var mvts = parseInt(document.getElementById('chipper-mvts').value) || 5;
-    var reps = parseInt(document.getElementById('chipper-reps').value) || 150;
-    workTotal = dur;
-    restTotal = 0;
-    rounds = mvts;
-    formatDesc = mvts + ' mouvements x ~' + Math.round(reps / mvts) + ' reps -- passage unique';
-
-  } else if (fmt === 'buyin') {
-    var bDur = parseInt(document.getElementById('buyin-dur').value) || 3;
-    var core = document.getElementById('buyin-core').value;
-    workTotal = dur;
-    restTotal = 0;
-    rounds = 1;
-    formatDesc = 'Buy-In/Out ' + bDur + ' min + ' + core.toUpperCase() + ' ' + (dur - bDur) + ' min';
-
-  } else if (fmt === 'ladder') {
-    var dir = document.getElementById('ladder-dir').value;
-    var steps = parseInt(document.getElementById('ladder-steps').value) || 3;
-    workTotal = dur;
-    restTotal = 0;
-    rounds = steps;
-    var dirLabel = (dir === 'desc') ? 'Descendante' : (dir === 'asc') ? 'Montante' : 'Pyramide';
-    formatDesc = dirLabel + ' -- ' + steps + ' paliers';
+  if (fmt==='emom') {
+    var ws=parseInt(document.getElementById('work-s').value)||35;
+    var intv=parseInt(document.getElementById('interval').value)||1;
+    var intv_s=intv*60, rest_s=intv_s-ws;
+    if (rest_s<=0) { document.getElementById('messages').innerHTML='<div class="msg bad">La duree de travail depasse l intervalle.</div>'; return; }
+    rounds=Math.floor((dur*60)/intv_s);
+    workTotal=Math.round(rounds*ws/60*10)/10; restTotal=Math.round(rounds*rest_s/60*10)/10;
+    ratio=Math.round((ws/rest_s)*100)/100; formatDesc=rounds+' rounds x '+ws+'s / '+rest_s+'s';
+  } else if (fmt==='tabata') {
+    workTotal=2.7; restTotal=1.3; ratio=2; rounds=8; formatDesc='8 rounds x 20s / 10s';
+  } else if (fmt==='amrap') {
+    workTotal=dur; rounds=1; formatDesc=dur+' min continus';
+  } else if (fmt==='fortime') {
+    workTotal=dur; rounds=1; formatDesc='Volume fixe -- estimation '+dur+' min';
+  } else if (fmt==='afap') {
+    workTotal=dur; rounds=1; formatDesc='Effort maximal -- score en temps';
+  } else if (fmt==='intervals') {
+    var iw=parseInt(document.getElementById('int-work').value)||40;
+    var ir=parseInt(document.getElementById('int-rest').value)||20;
+    rounds=Math.floor((dur*60)/(iw+ir));
+    workTotal=Math.round(rounds*iw/60*10)/10; restTotal=Math.round(rounds*ir/60*10)/10;
+    ratio=Math.round((iw/ir)*100)/100; formatDesc=rounds+' rounds x '+iw+'s / '+ir+'s';
+  } else if (fmt==='chipper') {
+    var mvts=parseInt(document.getElementById('chipper-mvts').value)||5;
+    var reps=parseInt(document.getElementById('chipper-reps').value)||150;
+    workTotal=dur; rounds=mvts; formatDesc=mvts+' mvts x ~'+Math.round(reps/mvts)+' reps';
+  } else if (fmt==='buyin') {
+    var bDur=parseInt(document.getElementById('buyin-dur').value)||3;
+    var core=document.getElementById('buyin-core').value;
+    workTotal=dur; rounds=1; formatDesc='Buy-In '+bDur+'min + '+core.toUpperCase()+' '+(dur-bDur)+'min';
+  } else if (fmt==='ladder') {
+    var dir=document.getElementById('ladder-dir').value;
+    var steps=parseInt(document.getElementById('ladder-steps').value)||3;
+    workTotal=dur; rounds=steps;
+    var dl=(dir==='desc')?'Descendante':(dir==='asc')?'Montante':'Pyramide';
+    formatDesc=dl+' -- '+steps+' paliers';
   }
 
   document.getElementById('m-work').textContent   = workTotal;
-  document.getElementById('m-ratio').textContent  = (ratio !== null) ? ratio + ':1' : 'cont.';
+  document.getElementById('m-ratio').textContent  = (ratio!==null) ? ratio+':1' : 'cont.';
   document.getElementById('m-rounds').textContent = rounds;
 
-  var isContinuous = (CONTINUOUS.indexOf(fmt) !== -1);
-  var details = [
-    ['Structure',           formatDesc],
-    ['Filiere cible',       tgt.label],
-    ['Zone optimale',       tgt.dur_min + ' a ' + tgt.dur_max + ' min'],
-    ['Ratio T:R optimal',   '1:' + tgt.ratio_min + ' a 1:' + tgt.ratio_max]
-  ];
-  if (!isContinuous) {
-    details.push(['Repos total', restTotal + ' min']);
-  }
-  var dHTML = '';
-  for (var d = 0; d < details.length; d++) {
-    dHTML += '<div class="detail-row"><span class="detail-key">' + details[d][0] + '</span><span class="detail-v">' + details[d][1] + '</span></div>';
-  }
-  document.getElementById('detail-rows').innerHTML = dHTML;
+  var isCont=(CONTINUOUS.indexOf(fmt)!==-1);
+  var details=[['Structure',formatDesc],['Filiere',tgt.label],['Zone optimale',tgt.dur_min+' a '+tgt.dur_max+' min'],['Ratio T:R optimal','1:'+tgt.ratio_min+' a 1:'+tgt.ratio_max]];
+  if (!isCont) details.push(['Repos total',restTotal+' min']);
+  var dHTML='';
+  for (var d=0;d<details.length;d++) dHTML+='<div class="drow"><span class="dk">'+details[d][0]+'</span><span class="dv">'+details[d][1]+'</span></div>';
+  document.getElementById('detail-rows').innerHTML=dHTML;
 
-  var msgs = [];
+  var msgs=[];
+  if (ratio!==null) {
+    if (energy==='alactate'&&ratio>0.5) msgs.push({cls:'bad',text:'Ratio T:R trop eleve pour la filiere phosphocreatine. Cible : 1:5 a 1:8.'});
+    else if (energy==='anaerobic'&&ratio>0.7) msgs.push({cls:'warn',text:'Ratio T:R ('+ratio+':1) trop dense pour l anaerobie lactique. Vise 1:2 a 1:4.'});
+    else if (energy==='aerobic'&&ratio<0.4) msgs.push({cls:'warn',text:'Trop de repos pour un objectif aerobie. La filiere aerobie se developpe sous pression continue.'});
+  }
+  if (workTotal<tgt.dur_min) msgs.push({cls:'bad',text:'Volume effectif ('+workTotal+' min) insuffisant. Minimum : '+tgt.dur_min+' min.'});
+  else if (workTotal>tgt.dur_max) msgs.push({cls:'warn',text:'Volume ('+workTotal+' min) depasse la zone optimale (max : '+tgt.dur_max+' min).'});
+  if (movement==='weightlifting'&&(fmt==='amrap'||fmt==='fortime'||fmt==='afap')&&dur>12) msgs.push({cls:'warn',text:'Halterophilie dominante sans repos sur '+dur+' min : risque de degradation technique. Envisage un EMOM.'});
+  if (movement==='gymnastics'&&fmt==='emom') msgs.push({cls:'ok',text:'EMOM + gymnastics : format optimal pour la technique sous fatigue controlee.'});
+  if (fmt==='afap') {
+    if (dur<4) msgs.push({cls:'warn',text:'Duree < 4 min : filiere anaerobie quasi-sprint.'});
+    else if (dur>20) msgs.push({cls:'warn',text:'Duree > 20 min en AFAP : pacing inevitable. Envisage un AMRAP.'});
+    else msgs.push({cls:'ok',text:'Zone AFAP optimale (4-20 min).'});
+  }
+  if (fmt==='chipper') {
+    var cM=parseInt(document.getElementById('chipper-mvts').value)||5;
+    var cR=parseInt(document.getElementById('chipper-reps').value)||150;
+    if (cM>7) msgs.push({cls:'warn',text:cM+' mouvements : risque de confusion. Ideal : 4-6 max.'});
+    if (cR>250) msgs.push({cls:'warn',text:'Volume eleve ('+cR+' reps). Place les mouvements techniques en debut.'});
+    msgs.push({cls:'ok',text:'Chipper : techniques en debut, mouvements simples en fin.'});
+  }
+  if (fmt==='buyin') {
+    var bV=parseInt(document.getElementById('buyin-dur').value)||3;
+    if (bV>5) msgs.push({cls:'warn',text:'Buy-In > 5 min : pre-fatigue trop elevee. Maintiens entre 2 et 4 min.'});
+    else msgs.push({cls:'ok',text:'Buy-In bien dose. Pre-fatigue controlee avant le WOD central.'});
+  }
+  if (fmt==='ladder') {
+    var lDir=document.getElementById('ladder-dir').value;
+    if (lDir==='desc') msgs.push({cls:'ok',text:'Ladder descendante : volume decroit quand la fatigue augmente.'});
+    else if (lDir==='asc') msgs.push({cls:'warn',text:'Ladder montante : volume croissant sous fatigue. Prevois une charge moderee.'});
+    else msgs.push({cls:'ok',text:'Pyramide : pic d intensite au milieu, recuperation progressive.'});
+  }
+  if (msgs.length===0) msgs.push({cls:'ok',text:'Coherence validee. Parametres compatibles avec '+tgt.label+'.'});
 
-  if (ratio !== null) {
-    if (energy === 'alactate' && ratio > 0.5) {
-      msgs.push({cls:'bad', text:'Ratio T:R trop eleve pour la filiere phosphocreatine (' + ratio + ':1). Cible : 1:5 a 1:8 -- augmente le repos.'});
-    } else if (energy === 'anaerobic' && ratio > 0.7) {
-      msgs.push({cls:'warn', text:'Ratio T:R (' + ratio + ':1) trop dense pour l anaerobie lactique. Vise 1:2 a 1:4.'});
-    } else if (energy === 'aerobic' && ratio < 0.4) {
-      msgs.push({cls:'warn', text:'Trop de repos pour un objectif aerobie (ratio ' + ratio + ':1). La filiere aerobie se developpe sous pression continue.'});
-    }
-  }
-
-  if (workTotal < tgt.dur_min) {
-    msgs.push({cls:'bad', text:'Volume de travail effectif (' + workTotal + ' min) insuffisant pour la filiere ' + tgt.label + '. Minimum : ' + tgt.dur_min + ' min.'});
-  } else if (workTotal > tgt.dur_max) {
-    msgs.push({cls:'warn', text:'Volume de travail (' + workTotal + ' min) depasse la zone optimale pour ' + tgt.label + ' (max : ' + tgt.dur_max + ' min).'});
-  }
-
-  if (movement === 'weightlifting' && (fmt === 'amrap' || fmt === 'fortime' || fmt === 'afap') && dur > 12) {
-    msgs.push({cls:'warn', text:'Halterophilie dominante sur ' + dur + ' min sans repos : risque de degradation technique sous fatigue. Envisage un EMOM ou des intervalles.'});
-  }
-  if (movement === 'gymnastics' && fmt === 'emom') {
-    msgs.push({cls:'ok', text:'EMOM + gymnastics : format optimal pour developper la technique sous fatigue controlee.'});
-  }
-
-  if (fmt === 'afap') {
-    if (dur < 4) {
-      msgs.push({cls:'warn', text:'Duree < 4 min : effort quasi-sprint, filiere anaerobie dominante.'});
-    } else if (dur > 20) {
-      msgs.push({cls:'warn', text:'Duree > 20 min en AFAP : l athlète va inevitablement gerer son allure. Envisage un AMRAP ou des intervalles.'});
-    } else {
-      msgs.push({cls:'ok', text:'Zone AFAP optimale (4-20 min). Assure-toi que le volume permet un effort maximal soutenu.'});
-    }
-  }
-
-  if (fmt === 'chipper') {
-    var cM = parseInt(document.getElementById('chipper-mvts').value) || 5;
-    var cR = parseInt(document.getElementById('chipper-reps').value) || 150;
-    if (cM > 7) {
-      msgs.push({cls:'warn', text:cM + ' mouvements distincts : risque de confusion. Ideal : 4-6 mouvements max.'});
-    }
-    if (cR > 250) {
-      msgs.push({cls:'warn', text:'Volume total eleve (' + cR + ' reps). Place les mouvements techniques en debut de sequence.'});
-    }
-    msgs.push({cls:'ok', text:'Chipper : mouvements techniques ou lourds en debut, mouvements simples (burpees, sit-ups) en fin.'});
-  }
-
-  if (fmt === 'buyin') {
-    var bV = parseInt(document.getElementById('buyin-dur').value) || 3;
-    if (bV > 5) {
-      msgs.push({cls:'warn', text:'Buy-In > 5 min : fatigue pre-existante trop elevee, risque de compromettre le WOD central. Maintiens entre 2 et 4 min.'});
-    } else {
-      msgs.push({cls:'ok', text:'Buy-In bien dose. Cree une fatigue controlee avant le WOD central. Cash-Out = accumulation de volume accessoire cible.'});
-    }
-  }
-
-  if (fmt === 'ladder') {
-    var lDir = document.getElementById('ladder-dir').value;
-    if (lDir === 'desc') {
-      msgs.push({cls:'ok', text:'Ladder descendante (21-15-9) : volume decroit quand la fatigue augmente -- l athlète peut accelerer sur les derniers paliers.'});
-    } else if (lDir === 'asc') {
-      msgs.push({cls:'warn', text:'Ladder montante : volume croissant sous fatigue croissante. Prevois une charge moderee ou un format I go / you go pour creer du repos passif.'});
-    } else {
-      msgs.push({cls:'ok', text:'Pyramide : pic d intensite au milieu, puis volume decroissant. Bonne structure pour du volume modere avec recuperation progressive.'});
-    }
-  }
-
-  if (msgs.length === 0) {
-    msgs.push({cls:'ok', text:'Coherence physiologique validee. Parametres compatibles avec la filiere ' + tgt.label + '.'});
-  }
-
-  var mHTML = '';
-  for (var m = 0; m < msgs.length; m++) {
-    mHTML += '<div class="msg ' + msgs[m].cls + '">' + msgs[m].text + '</div>';
-  }
-  document.getElementById('messages').innerHTML = mHTML;
+  var mHTML='';
+  for (var m=0;m<msgs.length;m++) mHTML+='<div class="msg '+msgs[m].cls+'">'+msgs[m].text+'</div>';
+  document.getElementById('messages').innerHTML=mHTML;
 }
 
 setFmt('emom');
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js');
-  });
+  window.addEventListener('load', function() { navigator.serviceWorker.register('/sw.js'); });
 }
 </script>
 </body>
