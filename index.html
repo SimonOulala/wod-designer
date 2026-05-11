@@ -137,6 +137,31 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
   .ptabs{flex-wrap:wrap;}
   .ptab{flex:none;width:calc(33% - 4px);}
 }
+
+/* Library */
+.lib-filter-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--muted);cursor:pointer;font-family:var(--mono);font-size:9px;letter-spacing:.05em;padding:4px 8px;text-transform:uppercase;transition:all .12s;user-select:none;}
+.lib-filter-btn:hover{border-color:var(--border-hi);color:var(--text);}
+.lib-filter-btn.active{background:var(--blue-bg);border-color:var(--blue-text);color:var(--blue-text);}
+.lib-item{display:flex;align-items:flex-start;gap:9px;padding:7px 9px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);cursor:pointer;transition:border-color .12s;}
+.lib-item:hover{border-color:var(--border-hi);}
+.lib-item.in-wod{border-color:var(--accent);background:var(--accent-dim);}
+.lib-item-cb{width:13px;height:13px;border:1px solid var(--border-hi);border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--accent);}
+.lib-item.in-wod .lib-item-cb{background:var(--accent);border-color:var(--accent);color:#0d0f10;}
+.lib-item-body{flex:1;}
+.lib-item-name{font-size:12px;font-weight:500;color:var(--text);}
+.lib-item.in-wod .lib-item-name{color:var(--accent);}
+.lib-item-meta{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;}
+.lib-tag{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;}
+.lib-tag-cat{background:rgba(112,184,255,0.1);color:var(--blue-text);}
+.lib-tag-pat{background:rgba(212,240,96,0.1);color:var(--accent);}
+.lib-tag-lvl-b{background:var(--ok-bg);color:var(--ok-text);}
+.lib-tag-lvl-i{background:var(--warn-bg);color:var(--warn-text);}
+.lib-tag-lvl-a{background:var(--danger-bg);color:var(--danger-text);}
+.lib-item-note{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;}
+.wod-line{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);font-size:12px;}
+.wod-line-name{color:var(--text);}
+.wod-line-remove{color:var(--muted);cursor:pointer;font-family:var(--mono);font-size:11px;padding:0 3px;}
+.wod-line-remove:hover{color:var(--danger-text);}
 </style>
 </head>
 <body>
@@ -144,7 +169,7 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
 
 <header>
   <h1>WOD Designer</h1>
-  <p>// Analyse physiologique — formats & patterns — v1.3</p>
+  <p>// Analyse physiologique — formats & patterns — bibliotheque — v1.4</p>
 </header>
 
 <div class="slabel">01 -- Format</div>
@@ -177,8 +202,9 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
 <div class="slabel">Outils patterns de mouvement</div>
 <div class="ptabs">
   <div class="ptab" id="tab-a" onclick="openTab('a')">A — Filtrage</div>
-  <div class="ptab" id="tab-b" onclick="openTab('b')">B — Combinaisons</div>
-  <div class="ptab" id="tab-c" onclick="openTab('c')">C — Exemple annote</div>
+  <div class="ptab" id="tab-b" onclick="openTab('b')">B — Combos</div>
+  <div class="ptab" id="tab-c" onclick="openTab('c')">C — Annote</div>
+  <div class="ptab" id="tab-d" onclick="openTab('d')">D — Biblio</div>
 </div>
 
 <!-- Panel A: filtrage -->
@@ -200,6 +226,31 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
   <div style="padding:12px 13px;">
     <div class="finfo-ex-lbl" style="margin-bottom:8px">Seance de reference — patterns mobilises</div>
     <div class="wod-block" id="panel-c-content"></div>
+  </div>
+</div>
+
+<!-- Panel D: bibliotheque -->
+<div class="ptab-panel" id="panel-d">
+  <!-- Filter bar -->
+  <div style="padding:10px 13px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+    <span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px">Filtrer</span>
+    <div id="lib-cat-filters" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+  </div>
+  <!-- Search -->
+  <div style="padding:8px 13px;border-bottom:1px solid var(--border);">
+    <input type="text" id="lib-search" placeholder="Rechercher un exercice..." oninput="renderLibrary()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--body);font-size:12px;padding:7px 10px;outline:none;">
+  </div>
+  <!-- Exercise list -->
+  <div id="lib-list" style="padding:10px 13px;display:flex;flex-direction:column;gap:5px;max-height:460px;overflow-y:auto;"></div>
+  <!-- WOD Builder -->
+  <div id="lib-wod-section" style="display:none;border-top:1px solid var(--border);padding:10px 13px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">WOD compose</span>
+      <span onclick="clearWod()" style="font-family:var(--mono);font-size:9px;color:var(--danger-text);cursor:pointer;letter-spacing:.04em">Tout effacer</span>
+    </div>
+    <div id="lib-wod-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px;"></div>
+    <div id="lib-wod-interf" style="margin-bottom:8px;"></div>
+    <div onclick="exportWod()" style="background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--r);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:.06em;padding:8px 12px;text-align:center;cursor:pointer;text-transform:uppercase;">Copier le WOD</div>
   </div>
 </div>
 
@@ -594,6 +645,7 @@ function openTab(tab) {
   if (tab==='a') renderPatternFilter();
   if (tab==='b') renderCombos();
   if (tab==='c') renderAnnotated();
+  if (tab==='d') renderLibrary();
 }
 
 /* ---- OPTION A : pattern filter ---- */
@@ -723,6 +775,264 @@ function renderAnnotated() {
   document.getElementById('panel-c-content').innerHTML = html;
 }
 
+/* =====================================================================
+   EXERCISE LIBRARY
+===================================================================== */
+var EXERCISES = [
+  /* GYMNASTICS PULL */
+  {id:'pullup',    name:'Pull-Up',                cat:'Gymnastics',    pat:['pull_v'],               lvl:'i',fat:'l',fmt:['emom','amrap','fortime','afap','intervals','chipper','ladder'],note:'Traction stricte, bras tendus en bas, menton au-dessus de la barre. Fondation de tout le travail de traction verticale.'},
+  {id:'c2b',       name:'Chest-to-Bar',           cat:'Gymnastics',    pat:['pull_v'],               lvl:'i',fat:'l',fmt:['emom','amrap','fortime','afap','chipper','ladder'],            note:'Sternum touche la barre. Plus exigeant que le pull-up : demande mobilite epaule et force en fin de traction.'},
+  {id:'bmu',       name:'Bar Muscle-Up',          cat:'Gymnastics',    pat:['pull_v','push_v'],      lvl:'a',fat:'l',fmt:['emom','fortime','afap','chipper','ladder'],                    note:'Traction + transition + dip sur barre. Cumule pull et push vertical. Le mouvement le plus exigeant en gymnastics CrossFit.'},
+  {id:'rmu',       name:'Ring Muscle-Up',         cat:'Gymnastics',    pat:['pull_v','push_v'],      lvl:'a',fat:'l',fmt:['emom','fortime','afap','chipper'],                             note:'Version anneau du muscle-up. Instabilite des anneaux + transition plus profonde. Charge SNC elevee.'},
+  {id:'rpu',       name:'Ring Pull-Up',           cat:'Gymnastics',    pat:['pull_v'],               lvl:'i',fat:'l',fmt:['emom','amrap','fortime','intervals','chipper'],                note:'Pull-up sur anneaux. Rotation poignets augmente la demande stabilisatrice epaule.'},
+  {id:'t2b',       name:'Toes-to-Bar',            cat:'Gymnastics',    pat:['core_flex','pull_v'],   lvl:'i',fat:'m',fmt:['emom','amrap','fortime','afap','chipper','ladder'],            note:'Flexion hanche + compression gainage. Sollicite grand dorsal. Fatigue locale rapide sur les flechisseurs de hanche.'},
+  {id:'k2e',       name:'Knees-to-Elbow',         cat:'Gymnastics',    pat:['core_flex'],            lvl:'b',fat:'m',fmt:['emom','amrap','fortime','intervals','chipper'],                note:'Regression du T2B. Genoux touchent les coudes. Meme logique gainage mais amplitude reduite.'},
+  {id:'lsit',      name:'L-Sit',                  cat:'Gymnastics',    pat:['core_flex'],            lvl:'i',fat:'s',fmt:['emom','intervals','buyin'],                                   note:'Maintien isometrique hanches a 90 degres, jambes horizontales. Compression abdominale + force de hanche maximale.'},
+  /* GYMNASTICS PUSH */
+  {id:'hspu',      name:'Handstand Push-Up',      cat:'Gymnastics',    pat:['push_v'],               lvl:'a',fat:'l',fmt:['emom','amrap','fortime','afap','chipper','ladder'],            note:'Poussee verticale au poids de corps. Deltoide anterieur + tricep. Goulet frequent en competition. Regression : pike push-up.'},
+  {id:'hshold',    name:'Handstand Hold',         cat:'Gymnastics',    pat:['push_v'],               lvl:'i',fat:'s',fmt:['emom','intervals'],                                           note:'Equilibre sur les mains. Travail proprioceptif et stabilisation epaule. EMOM skill conditioning.'},
+  {id:'dip',       name:'Dip (anneaux)',           cat:'Gymnastics',    pat:['push_v','push_h'],      lvl:'i',fat:'l',fmt:['emom','amrap','fortime','intervals','chipper'],                note:'Tricep + pec sur anneaux. Instabilite augmente la demande stabilisatrice. Regression : box dip.'},
+  {id:'pushup',    name:'Push-Up',                cat:'Poids corps',   pat:['push_h'],               lvl:'b',fat:'l',fmt:['emom','amrap','fortime','tabata','intervals','chipper','ladder','buyin'],note:'Poussee horizontale. Pec + deltoide avant + tricep. Le mouvement le plus accessible en CrossFit.'},
+  {id:'rpushup',   name:'Ring Push-Up',           cat:'Gymnastics',    pat:['push_h'],               lvl:'i',fat:'l',fmt:['emom','amrap','fortime','intervals','chipper'],                note:'Push-up sur anneaux. Recrutement supplementaire des stabilisateurs epaule et gainage.'},
+  {id:'pikepush',  name:'Pike Push-Up',           cat:'Poids corps',   pat:['push_v'],               lvl:'b',fat:'l',fmt:['emom','amrap','fortime','intervals','chipper'],                note:'Regression du HSPU. Hanches hautes, tete descend entre les mains. Introduit la poussee verticale sans handstand.'},
+  /* SQUAT / HINGE POIDS DE CORPS */
+  {id:'airsquat',  name:'Air Squat',              cat:'Poids corps',   pat:['squat'],                lvl:'b',fat:'m',fmt:['emom','amrap','fortime','tabata','intervals','chipper','ladder','buyin'],note:'Squat au poids de corps. Quad + fessier. Base de Cindy. Fatigabilite moderee, volume eleve possible.'},
+  {id:'pistol',    name:'Pistol Squat',           cat:'Poids corps',   pat:['squat','lunge'],        lvl:'a',fat:'l',fmt:['emom','amrap','fortime','afap','chipper'],                    note:'Squat unilateral complet. Demande mobilite cheville et force quad massive. Teste la symetrie.'},
+  {id:'squatjump', name:'Squat Jump',             cat:'Poids corps',   pat:['squat','jump'],         lvl:'b',fat:'m',fmt:['emom','amrap','fortime','tabata','intervals','chipper'],       note:'Squat + saut vertical. Composante pliometrique. Plus metabolique que l air squat.'},
+  {id:'glutebridge',name:'Glute Bridge / Hip Thrust',cat:'Poids corps',pat:['hinge'],               lvl:'b',fat:'m',fmt:['emom','intervals','buyin'],                                   note:'Hinge au sol. Fessiers + ischios. Accessible, utile en circuit ou activation pre-seance.'},
+  {id:'nordic',    name:'Nordic Hamstring',       cat:'Poids corps',   pat:['hinge'],                lvl:'a',fat:'l',fmt:['emom','intervals'],                                           note:'Excentrique ischios-jambiers. Ancrage requis. Charge excentrique elevee : limiter le volume.'},
+  /* JUMP / POWER */
+  {id:'boxjump',   name:'Box Jump',               cat:'Poids corps',   pat:['jump','squat'],         lvl:'i',fat:'m',fmt:['emom','amrap','fortime','afap','intervals','chipper','ladder','buyin'],note:'Saut sur boite. Puissance basse chaine. Step-down recommande en chipper pour preserver les mollets.'},
+  {id:'broadjump', name:'Broad Jump',             cat:'Poids corps',   pat:['jump','hinge'],         lvl:'b',fat:'m',fmt:['emom','amrap','fortime','intervals'],                         note:'Saut horizontal. Combine puissance de hinge et projection. Utile pour la puissance fonctionnelle.'},
+  {id:'burpee',    name:'Burpee',                 cat:'Poids corps',   pat:['push_h','jump'],        lvl:'b',fat:'s',fmt:['amrap','fortime','afap','tabata','intervals','chipper','ladder','buyin'],note:'Push-up + saut. Pattern systemique par excellence. Tres metabolique, cumule push et cardio.'},
+  {id:'bjover',    name:'Bar Facing Burpee',      cat:'Poids corps',   pat:['push_h','jump'],        lvl:'i',fat:'s',fmt:['fortime','afap','chipper'],                                   note:'Burpee avec saut lateral par-dessus la barre. Variante competition. Plus exigeant sur le timing.'},
+  {id:'dub',       name:'Double Under',           cat:'Poids corps',   pat:['mono','jump'],          lvl:'i',fat:'m',fmt:['emom','amrap','fortime','afap','intervals','chipper','tabata'],note:'Corde a sauter x2 tours par saut. Coordination + puissance cheville. Fatigabilite mollet rapide.'},
+  {id:'singleunder',name:'Single Under',          cat:'Poids corps',   pat:['mono','jump'],          lvl:'b',fat:'m',fmt:['emom','amrap','fortime','intervals','chipper','tabata'],       note:'Corde a sauter standard. Accessible. Regression du double under.'},
+  /* LOCOMOTION / MONO */
+  {id:'run',       name:'Run',                    cat:'Mono',          pat:['mono'],                 lvl:'b',fat:'s',fmt:['amrap','fortime','afap','intervals','chipper','buyin','tabata'],note:'Course a pied. Mono-structural universel. Pas de materiel. Impact articulaire a surveiller en volume.'},
+  {id:'mtnclimber',name:'Mountain Climber',       cat:'Poids corps',   pat:['mono','core_flex'],     lvl:'b',fat:'s',fmt:['amrap','fortime','tabata','intervals','chipper'],              note:'Courir en planche. Combine cardio et gainage dynamique. Tres metabolique sur les intervalles courts.'},
+  /* CORE STATIQUE */
+  {id:'plank',     name:'Planche (Plank)',         cat:'Core Statique', pat:['core_flex'],            lvl:'b',fat:'s',fmt:['emom','intervals','tabata','buyin'],                          note:'Gainage anti-extension isometrique. La reference. Progressions : bras tendus, coudes, anneaux.'},
+  {id:'sidepl',    name:'Side Plank',             cat:'Core Statique', pat:['core_flex'],            lvl:'b',fat:'s',fmt:['emom','intervals','buyin'],                                   note:'Gainage lateral. Anti-flexion laterale. Teste la symetrie et la stabilite des obliques.'},
+  {id:'hollow',    name:'Hollow Hold',            cat:'Core Statique', pat:['core_flex'],            lvl:'i',fat:'s',fmt:['emom','intervals','tabata','buyin'],                          note:'Position creuse : bas du dos plaque au sol, membres etendus. Prerequis au kipping.'},
+  {id:'arch',      name:'Arch Hold',              cat:'Core Statique', pat:['core_flex'],            lvl:'b',fat:'s',fmt:['emom','intervals','buyin'],                                   note:'Extension isometrique. Antagoniste du hollow hold. Travail chaine posterieure au sol.'},
+  {id:'lsithang',  name:'L-Sit en suspension',   cat:'Core Statique', pat:['core_flex','pull_v'],   lvl:'a',fat:'s',fmt:['emom','intervals'],                                           note:'L-Sit a la barre ou anneaux. Compression maximale + stabilite epaule. Precede le muscle-up.'},
+  /* CORE DYNAMIQUE */
+  {id:'bearcrawl', name:'Bear Crawl',             cat:'Core Dynamique',pat:['core_flex','push_h'],   lvl:'b',fat:'m',fmt:['emom','amrap','intervals','chipper','buyin'],                 note:'Locomotion quadrupedique. Gainage dynamique + coordination. Utile en buy-in ou transition active.'},
+  {id:'commando',  name:'Commando Plank',         cat:'Core Dynamique',pat:['core_flex','push_h'],   lvl:'i',fat:'m',fmt:['emom','amrap','intervals','chipper'],                         note:'Passage planche coudes a bras tendus. Gainage dynamique avec composante poussee.'},
+  {id:'bodysaw',   name:'Body Saw',               cat:'Core Dynamique',pat:['core_flex'],            lvl:'i',fat:'m',fmt:['emom','intervals'],                                           note:'Anti-extension dynamique : planche sur slider, translation avant-arriere. Isole l anti-extension pure.'},
+  {id:'plankreach',name:'Planche + Reach',        cat:'Core Dynamique',pat:['core_flex'],            lvl:'i',fat:'m',fmt:['emom','intervals','buyin'],                                   note:'Planche avec extension alternee d un bras. Anti-rotation + gainage. Exige stabilite pelvienne active.'},
+  {id:'ringplank', name:'Planche sur anneaux',    cat:'Core Dynamique',pat:['core_flex','push_h'],   lvl:'a',fat:'s',fmt:['emom','intervals'],                                           note:'Planche en suspension sur anneaux. Instabilite multiplie la demande de stabilisation. Niveau avance.'},
+  /* CORE FLEXION */
+  {id:'situp',     name:'Sit-Up (AbMat)',         cat:'Core Flexion',  pat:['core_flex'],            lvl:'b',fat:'m',fmt:['emom','amrap','fortime','intervals','chipper','buyin'],        note:'Flexion lombaire complete sur AbMat. Attention a la fatigue lombaire cumulative en chipper long.'},
+  {id:'vup',       name:'V-Up',                   cat:'Core Flexion',  pat:['core_flex'],            lvl:'i',fat:'m',fmt:['emom','amrap','fortime','intervals','chipper'],                note:'Compression simultanee jambes + buste. Plus exigeant que le sit-up : demande mobilite de hanche.'},
+  {id:'ghdsit',    name:'GHD Sit-Up',             cat:'Core Flexion',  pat:['core_flex'],            lvl:'a',fat:'l',fmt:['emom','intervals','chipper'],                                 note:'Flexion complete sur GHD. Amplitude maximale. Risque rhabdomyolyse en volume. Max 15-20 reps si non habitue.'},
+  {id:'russtw',    name:'Russian Twist',          cat:'Core Flexion',  pat:['core_flex'],            lvl:'b',fat:'m',fmt:['emom','amrap','intervals','chipper','buyin'],                  note:'Rotation du tronc assis. Obliques + transverse. Peut etre leste avec KB ou medecine ball.'},
+  {id:'tuck',      name:'Tuck Crunch',            cat:'Core Flexion',  pat:['core_flex'],            lvl:'b',fat:'m',fmt:['emom','amrap','intervals','chipper'],                          note:'Compression genoux-poitrine. Regression du V-Up. Utile pour debutants ou en fin de chipper.'},
+  /* CORE ANTI-EXTENSION */
+  {id:'deadbug',   name:'Dead Bug',               cat:'Core Anti-Ext', pat:['core_flex'],            lvl:'b',fat:'s',fmt:['emom','intervals','buyin'],                                   note:'Anti-extension lombaire : bras et jambes s etendent alternativement sans perdre le dos au sol. Fondamental.'},
+  {id:'abwheel',   name:'Ab Wheel',               cat:'Core Anti-Ext', pat:['core_flex'],            lvl:'i',fat:'l',fmt:['emom','intervals'],                                           note:'Anti-extension dynamique maximale. Le plus exigeant pour l anti-extension. Necessite maitrise du gainage total.'},
+  {id:'dragonflag',name:'Dragon Flag',            cat:'Core Anti-Ext', pat:['core_flex'],            lvl:'a',fat:'l',fmt:['emom','intervals'],                                           note:'Gainage excentrique total en appui sur les epaules. Niveau avance. Charge anti-extension et flexion.'},
+  {id:'birddog',   name:'Bird Dog',               cat:'Core Anti-Ext', pat:['core_flex'],            lvl:'b',fat:'s',fmt:['emom','intervals','buyin'],                                   note:'Extension bras-jambe oppose en quadrupedie. Tres pedagogique pour coordination et stabilite lombaire.'},
+  /* CORE ANTI-ROTATION */
+  {id:'pallof',    name:'Pallof Press (bande)',    cat:'Core Anti-Rot', pat:['core_flex'],            lvl:'b',fat:'s',fmt:['emom','intervals','buyin'],                                   note:'Anti-rotation avec bande elastique. Pression frontale depuis le cote : resister a la rotation. Reference anti-rotation.'},
+  {id:'copenpl',   name:'Copenhagen Plank',       cat:'Core Anti-Rot', pat:['core_flex'],            lvl:'i',fat:'s',fmt:['emom','intervals','buyin'],                                   note:'Planche laterale avec appui pied superieur. Adducteurs + obliques. Prevention blessures hanche-genou.'},
+  {id:'sacarry',   name:'Single Arm Carry',       cat:'Core Anti-Rot', pat:['carry','core_flex'],    lvl:'b',fat:'s',fmt:['emom','intervals','chipper','buyin'],                         note:'Porter une seule charge. Desequilibre force le tronc a resister a la flexion laterale. Anti-rotation fonctionnelle.'},
+  {id:'bandrot',   name:'Rotation bande',         cat:'Core Anti-Rot', pat:['core_flex'],            lvl:'b',fat:'s',fmt:['emom','intervals','buyin'],                                   note:'Rotation du tronc avec resistance elastique. Obliques + transverse. Utile pour sports de rotation.'},
+  /* CORE CHARGE */
+  {id:'tgu',       name:'Turkish Get-Up',         cat:'Core Charge',   pat:['core_flex','carry','olympic'],lvl:'a',fat:'s',fmt:['emom','intervals'],                                    note:'7 patterns en un seul mouvement. Transition sol-debout avec KB. Ne jamais programmer en volume sous fatigue.'},
+  {id:'windmill',  name:'KB Windmill',            cat:'Core Charge',   pat:['core_flex','hinge'],    lvl:'a',fat:'s',fmt:['emom','intervals'],                                           note:'Flexion laterale sous charge overhead. Mobilite hanche + stabilite epaule + anti-flexion. Base technique solide requise.'},
+  {id:'weightsit', name:'Weighted Sit-Up',        cat:'Core Charge',   pat:['core_flex'],            lvl:'i',fat:'m',fmt:['emom','amrap','fortime','intervals','chipper'],                note:'Sit-up avec charge (medecine ball, disque). Augmente la demande sur flechisseurs de hanche et abdominaux.'},
+  {id:'suitcase',  name:'Suitcase Carry',         cat:'Core Charge',   pat:['carry','core_flex'],    lvl:'b',fat:'s',fmt:['emom','intervals','chipper','buyin'],                         note:'Porter une charge asymetrique. Anti-flexion laterale tres fonctionnelle et sous-utilisee en CrossFit.'},
+  /* GPP / MOBILITE */
+  {id:'crawl',     name:'Crawl (Primal)',          cat:'GPP / Mobilite',pat:['core_flex','push_h'],   lvl:'b',fat:'m',fmt:['buyin','intervals'],                                          note:'Locomotion primaire. Coordination croisee + gainage dynamique. Ideal en echauffement ou transition active.'},
+  {id:'crabwalk',  name:'Crab Walk',              cat:'GPP / Mobilite',pat:['push_h','core_flex'],   lvl:'b',fat:'m',fmt:['buyin','intervals'],                                          note:'Locomotion en appui dorsal. Active epaules posterieures et triceps. Contre-mouvement du bear crawl.'},
+  {id:'inchworm',  name:'Inchworm',               cat:'GPP / Mobilite',pat:['push_h','hinge'],       lvl:'b',fat:'m',fmt:['buyin','intervals'],                                          note:'Marche des mains depuis debout. Mobilite chaine posterieure + activation epaules. Excellent echauffement.'},
+  {id:'worldgt',   name:'World Greatest Stretch', cat:'GPP / Mobilite',pat:['squat','hinge','core_flex'],lvl:'b',fat:'s',fmt:['buyin'],                                                 note:'Sequence mobilite complete : fente + rotation thoracique + extension. Couvre les 3 plans. Reference echauffement.'},
+  {id:'spiderman', name:'Spiderman Crawl',        cat:'GPP / Mobilite',pat:['core_flex','lunge'],    lvl:'b',fat:'m',fmt:['buyin','intervals'],                                          note:'Fente + rotation thoracique en locomotion. Mobilite hanche et colonne. Activation et decouverte de l espace.'},
+];
+
+var EX_CATS = ['Gymnastics','Poids corps','Mono','Core Statique','Core Dynamique','Core Flexion','Core Anti-Ext','Core Anti-Rot','Core Charge','GPP / Mobilite'];
+var wodExercises = [];
+var libCatFilter = 'all';
+
+function loadCustomExercises() {
+  try {
+    var stored = localStorage.getItem('wod_custom_exercises');
+    if (stored) {
+      var custom = JSON.parse(stored);
+      for (var i = 0; i < custom.length; i++) { custom[i].custom = true; EXERCISES.push(custom[i]); }
+    }
+  } catch(e) {}
+}
+
+function saveCustomExercises() {
+  try {
+    var custom = EXERCISES.filter(function(e){ return e.custom; });
+    localStorage.setItem('wod_custom_exercises', JSON.stringify(custom));
+  } catch(e) {}
+}
+
+function renderLibrary() {
+  var search = (document.getElementById('lib-search').value || '').toLowerCase();
+  var catHTML = '<div class="lib-filter-btn'+(libCatFilter==='all'?' active':'')+'" onclick="setLibCat(\'all\')">Tous</div>';
+  for (var c = 0; c < EX_CATS.length; c++) {
+    catHTML += '<div class="lib-filter-btn'+(libCatFilter===EX_CATS[c]?' active':'')+'" onclick="setLibCat(\''+EX_CATS[c]+'\')">'+EX_CATS[c]+'</div>';
+  }
+  catHTML += '<div class="lib-filter-btn" style="border-color:var(--accent);color:var(--accent)" onclick="openAddForm()">+ Ajouter</div>';
+  document.getElementById('lib-cat-filters').innerHTML = catHTML;
+
+  var filtered = EXERCISES.filter(function(ex) {
+    var matchCat = (libCatFilter==='all') || (ex.cat===libCatFilter);
+    var matchSearch = !search || ex.name.toLowerCase().indexOf(search)!==-1 || ex.note.toLowerCase().indexOf(search)!==-1;
+    return matchCat && matchSearch;
+  });
+
+  var html = '';
+  if (filtered.length===0) html = '<div style="color:var(--muted);font-size:12px;padding:8px 0">Aucun exercice trouve.</div>';
+  for (var i = 0; i < filtered.length; i++) {
+    var ex = filtered[i];
+    var inWod = wodExercises.indexOf(ex.id)!==-1;
+    var lvlCls = 'lib-tag lib-tag-lvl-'+(ex.lvl||'b');
+    var lvlLbl = ex.lvl==='a'?'Avance':ex.lvl==='i'?'Intermediaire':'Debutant';
+    var patNames = (ex.pat||[]).map(function(pid){ var p=getPattern(pid); return p?p.name:pid; }).join(' + ');
+    html += '<div class="lib-item'+(inWod?' in-wod':'')+'" onclick="toggleWodEx(\''+ex.id+'\')" id="lex-'+ex.id+'">';
+    html += '<div class="lib-item-cb">'+(inWod?'v':'')+'</div>';
+    html += '<div class="lib-item-body">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px">';
+    html += '<span class="lib-item-name">'+ex.name+(ex.custom?'<span style="font-family:var(--mono);font-size:9px;color:var(--blue-text);margin-left:5px">PERSO</span>':'')+'</span>';
+    html += '<div style="display:flex;gap:4px;flex-shrink:0">';
+    if (ex.video) html += '<span onclick="openVideo(event,\''+ex.video+'\')" style="font-family:var(--mono);font-size:9px;color:var(--blue-text);cursor:pointer;padding:2px 6px;border:1px solid var(--blue-text);border-radius:3px">VIDEO</span>';
+    if (ex.custom) html += '<span onclick="deleteCustomEx(event,\''+ex.id+'\')" style="font-family:var(--mono);font-size:9px;color:var(--danger-text);cursor:pointer;padding:2px 6px;border:1px solid var(--danger-text);border-radius:3px">X</span>';
+    html += '</div></div>';
+    html += '<div class="lib-item-meta"><span class="lib-tag lib-tag-cat">'+ex.cat+'</span><span class="lib-tag lib-tag-pat">'+patNames+'</span><span class="'+lvlCls+'">'+lvlLbl+'</span></div>';
+    html += '<div class="lib-item-note">'+ex.note+'</div>';
+    html += '</div></div>';
+  }
+  document.getElementById('lib-list').innerHTML = html;
+  renderWodBuilder();
+}
+
+function setLibCat(cat) { libCatFilter=cat; renderLibrary(); }
+
+function toggleWodEx(id) {
+  var idx = wodExercises.indexOf(id);
+  if (idx===-1) wodExercises.push(id); else wodExercises.splice(idx,1);
+  renderLibrary();
+}
+
+function renderWodBuilder() {
+  var sec = document.getElementById('lib-wod-section');
+  if (wodExercises.length===0) { sec.style.display='none'; return; }
+  sec.style.display='block';
+  var html='';
+  for (var i=0;i<wodExercises.length;i++) {
+    var ex=getExercise(wodExercises[i]); if (!ex) continue;
+    var pn=(ex.pat||[]).map(function(pid){var p=getPattern(pid);return p?p.name:pid;}).join(' + ');
+    html+='<div class="wod-line"><div class="wod-line-name">'+ex.name+' <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">'+pn+'</span></div><span class="wod-line-remove" onclick="removeWodEx(\''+ex.id+'\')">retirer</span></div>';
+  }
+  document.getElementById('lib-wod-list').innerHTML=html;
+
+  var allPats=[];
+  for (var j=0;j<wodExercises.length;j++) {
+    var e=getExercise(wodExercises[j]); if (!e) continue;
+    for (var k=0;k<e.pat.length;k++) { if (allPats.indexOf(e.pat[k])===-1) allPats.push(e.pat[k]); }
+  }
+  var conflicts=[];
+  for (var a=0;a<allPats.length;a++) {
+    for (var b=a+1;b<allPats.length;b++) {
+      var pA=getPattern(allPats[a]), pB=getPattern(allPats[b]); if (!pA||!pB) continue;
+      var shared=[];
+      for (var m=0;m<pA.muscles.length;m++) { if (pB.muscles.indexOf(pA.muscles[m])!==-1) shared.push(pA.muscles[m]); }
+      if (shared.length>0) conflicts.push({a:pA.name,b:pB.name,muscles:shared,sev:shared.length>=2?'bad':'warn'});
+    }
+  }
+  var iHTML='';
+  if (conflicts.length===0&&wodExercises.length>=2) iHTML='<div class="msg ok" style="font-size:11px">Aucune interference detectee entre les patterns de ce WOD.</div>';
+  for (var cf=0;cf<conflicts.length;cf++) {
+    var cv=conflicts[cf];
+    iHTML+='<div class="msg '+cv.sev+'" style="font-size:11px">'+cv.a+' / '+cv.b+' : muscles partages — '+cv.muscles.join(', ')+(cv.sev==='bad'?' — Interference elevee.':' — Interference moderee.')+'</div>';
+  }
+  document.getElementById('lib-wod-interf').innerHTML=iHTML;
+}
+
+function removeWodEx(id) { var idx=wodExercises.indexOf(id); if (idx!==-1) wodExercises.splice(idx,1); renderLibrary(); }
+function clearWod() { wodExercises=[]; renderLibrary(); }
+
+function exportWod() {
+  var lines=['WOD — '+currentFmt.toUpperCase(),''];
+  for (var i=0;i<wodExercises.length;i++) { var ex=getExercise(wodExercises[i]); if (ex) lines.push('- '+ex.name); }
+  lines.push('','Genere par WOD Designer — Methode Force Hybride');
+  var text=lines.join('\n');
+  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){ alert('WOD copie !'); }); }
+  else { prompt('Copie ce WOD :',text); }
+}
+
+function getExercise(id) { for (var i=0;i<EXERCISES.length;i++) { if (EXERCISES[i].id===id) return EXERCISES[i]; } return null; }
+function openVideo(event,url) { event.stopPropagation(); window.open(url,'_blank'); }
+
+function deleteCustomEx(event,id) {
+  event.stopPropagation();
+  if (!confirm('Supprimer cet exercice ?')) return;
+  EXERCISES=EXERCISES.filter(function(e){ return e.id!==id; });
+  var idx=wodExercises.indexOf(id); if (idx!==-1) wodExercises.splice(idx,1);
+  saveCustomExercises(); renderLibrary();
+}
+
+var cfSelectedPats=[];
+
+function openAddForm() {
+  var panel=document.getElementById('lib-list');
+  var fHTML='<div id="add-form" style="background:var(--bg3);border:1px solid var(--accent);border-radius:var(--r);padding:12px;margin-bottom:10px">';
+  fHTML+='<div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--accent);margin-bottom:10px">NOUVEL EXERCICE PERSONNALISE</div>';
+  fHTML+='<div style="display:flex;flex-direction:column;gap:8px">';
+  fHTML+='<input type="text" id="cf-name" placeholder="Nom de l exercice *" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:12px;padding:7px 10px;outline:none;width:100%">';
+  fHTML+='<input type="url" id="cf-video" placeholder="Lien YouTube (optionnel)" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:12px;padding:7px 10px;outline:none;width:100%">';
+  fHTML+='<select id="cf-cat" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:12px;padding:7px 10px;outline:none;width:100%;-webkit-appearance:none">';
+  for (var c=0;c<EX_CATS.length;c++) fHTML+='<option value="'+EX_CATS[c]+'">'+EX_CATS[c]+'</option>';
+  fHTML+='</select>';
+  fHTML+='<div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.06em">PATTERNS (selectionnez tous ceux qui s appliquent)</div>';
+  fHTML+='<div style="display:flex;flex-wrap:wrap;gap:5px">';
+  cfSelectedPats=[];
+  for (var p=0;p<ALL_PATTERNS.length;p++) {
+    fHTML+='<div id="cfp-'+ALL_PATTERNS[p].id+'" onclick="toggleCfPat(\''+ALL_PATTERNS[p].id+'\')" style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:3px;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:var(--bg2)">'+ALL_PATTERNS[p].name+'</div>';
+  }
+  fHTML+='</div>';
+  fHTML+='<select id="cf-lvl" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:12px;padding:7px 10px;outline:none;width:100%;-webkit-appearance:none"><option value="b">Debutant</option><option value="i">Intermediaire</option><option value="a">Avance</option></select>';
+  fHTML+='<input type="text" id="cf-note" placeholder="Note pedagogique (optionnel)" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:12px;padding:7px 10px;outline:none;width:100%">';
+  fHTML+='<div style="display:flex;gap:8px">';
+  fHTML+='<div onclick="submitAddForm()" style="flex:1;background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--r);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:.06em;padding:8px;text-align:center;cursor:pointer">Ajouter</div>';
+  fHTML+='<div onclick="renderLibrary()" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.06em;padding:8px;text-align:center;cursor:pointer">Annuler</div>';
+  fHTML+='</div></div></div>';
+  panel.innerHTML=fHTML+panel.innerHTML;
+}
+
+function toggleCfPat(pid) {
+  var el=document.getElementById('cfp-'+pid);
+  var idx=cfSelectedPats.indexOf(pid);
+  if (idx===-1) { cfSelectedPats.push(pid); el.style.background='var(--accent-dim)'; el.style.color='var(--accent)'; el.style.borderColor='var(--accent)'; }
+  else { cfSelectedPats.splice(idx,1); el.style.background='var(--bg2)'; el.style.color='var(--muted)'; el.style.borderColor='var(--border)'; }
+}
+
+function submitAddForm() {
+  var name=(document.getElementById('cf-name').value||'').trim();
+  if (!name) { alert('Le nom est obligatoire.'); return; }
+  var video=(document.getElementById('cf-video').value||'').trim();
+  var cat=document.getElementById('cf-cat').value;
+  var lvl=document.getElementById('cf-lvl').value;
+  var note=(document.getElementById('cf-note').value||'').trim();
+  var pats=cfSelectedPats.length>0?cfSelectedPats.slice():['core_flex'];
+  var id='custom_'+Date.now();
+  var ex={id:id,name:name,cat:cat,pat:pats,lvl:lvl,fat:'m',fmt:['emom','amrap','fortime','afap','intervals','tabata','chipper','buyin','ladder'],note:note||'Exercice personnalise.',custom:true};
+  if (video) ex.video=video;
+  EXERCISES.push(ex);
+  cfSelectedPats=[];
+  saveCustomExercises();
+  libCatFilter=cat;
+  renderLibrary();
+}
+
+
 /* ===== CALC FUNCTION ===== */
 function calc() {
   var fmt=currentFmt, dur=parseInt(document.getElementById('duration').value)||20;
@@ -818,6 +1128,7 @@ function calc() {
   document.getElementById('messages').innerHTML=mHTML;
 }
 
+loadCustomExercises();
 setFmt('emom');
 
 if ('serviceWorker' in navigator) {
