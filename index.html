@@ -138,6 +138,78 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
   .ptab{flex:none;width:calc(33% - 4px);}
 }
 
+
+/* ===== LEARN SECTION ===== */
+.learn-section{background:var(--bg2);border:1px solid rgba(212,240,96,0.25);border-radius:var(--r);margin-bottom:28px;overflow:hidden;}
+.learn-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.learn-header-left{display:flex;align-items:center;gap:10px;}
+.learn-badge{background:var(--accent-dim);border:1px solid var(--accent);border-radius:3px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--accent);padding:2px 7px;text-transform:uppercase;}
+.learn-title{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:.04em;color:var(--text);text-transform:uppercase;}
+.learn-toggle{font-family:var(--mono);font-size:11px;color:var(--muted);}
+.learn-body{display:none;}
+.learn-body.open{display:block;}
+.learn-tabs{display:flex;border-bottom:1px solid var(--border);}
+.learn-tab{flex:1;padding:10px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-right:1px solid var(--border);transition:all .15s;user-select:none;}
+.learn-tab:last-child{border-right:none;}
+.learn-tab:hover{color:var(--text);}
+.learn-tab.active{background:var(--accent-dim);color:var(--accent);}
+.learn-panel{display:none;padding:16px;}
+.learn-panel.show{display:block;}
+.step-indicator{display:flex;gap:4px;margin-bottom:16px;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);transition:all .2s;}
+.step-dot.done{background:var(--accent);border-color:var(--accent);}
+.step-dot.current{background:transparent;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim);}
+.step-card{background:var(--bg3);border-radius:var(--r);padding:14px;}
+.step-num{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;text-transform:uppercase;}
+.step-q{font-size:14px;font-weight:500;color:var(--text);margin-bottom:12px;line-height:1.5;}
+.step-hint{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;font-style:italic;}
+.step-choices{display:flex;flex-direction:column;gap:6px;}
+.step-choice{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;cursor:pointer;font-size:13px;color:var(--text);transition:all .15s;user-select:none;}
+.step-choice:hover{border-color:var(--border-hi);}
+.step-choice.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--accent);}
+.step-input-row{display:flex;gap:8px;align-items:center;}
+.step-input{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:13px;padding:8px 11px;outline:none;width:100px;transition:border-color .15s;-webkit-appearance:none;}
+.step-input:focus{border-color:var(--accent);}
+.step-btn{background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--r);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:.06em;padding:8px 14px;cursor:pointer;text-transform:uppercase;user-select:none;white-space:nowrap;}
+.step-btn:hover{background:rgba(212,240,96,0.2);}
+.step-btn.secondary{background:var(--bg2);border-color:var(--border);color:var(--muted);}
+.step-feedback{border-radius:var(--r);font-size:12px;line-height:1.6;padding:10px 12px;margin-top:10px;}
+.step-feedback.ok{background:var(--ok-bg);color:var(--ok-text);}
+.step-feedback.bad{background:var(--danger-bg);color:var(--danger-text);}
+.step-feedback.warn{background:var(--warn-bg);color:var(--warn-text);}
+.step-summary{background:var(--bg3);border-radius:var(--r);padding:12px;margin-top:12px;}
+.step-summary-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.step-summary-row:last-child{border-bottom:none;}
+.step-summary-key{color:var(--muted);font-family:var(--mono);font-size:10px;}
+.step-summary-val{color:var(--accent);font-weight:500;}
+.diag-wod{background:var(--bg3);border-left:2px solid var(--warn-text);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;}
+.diag-wod-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--warn-text);margin-bottom:8px;text-transform:uppercase;}
+.diag-wod-content{font-size:13px;color:var(--text);line-height:1.8;}
+.diag-wod-intent{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.diag-error-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.diag-error-item{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color .15s;user-select:none;}
+.diag-error-item:hover{border-color:var(--border-hi);}
+.diag-error-item.checked{border-color:var(--warn-text);background:rgba(255,180,60,0.08);}
+.diag-cb{width:13px;height:13px;border:1px solid var(--border-hi);border-radius:3px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--warn-text);}
+.diag-error-item.checked .diag-cb{background:rgba(255,180,60,0.3);border-color:var(--warn-text);}
+.diag-error-text{font-size:12px;color:var(--text);line-height:1.4;}
+.diag-reveal{background:var(--bg3);border-radius:var(--r);padding:12px 14px;margin-top:12px;}
+.diag-reveal-title{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--accent);margin-bottom:10px;text-transform:uppercase;}
+.diag-error-revealed{padding:8px 10px;border-radius:var(--r);margin-bottom:6px;font-size:12px;line-height:1.5;}
+.diag-error-revealed.real{background:var(--danger-bg);color:var(--danger-text);border-left:2px solid var(--danger-text);}
+.diag-error-revealed.missed{background:var(--warn-bg);color:var(--warn-text);border-left:2px solid var(--warn-text);}
+.diag-error-revealed.correct{background:var(--ok-bg);color:var(--ok-text);border-left:2px solid var(--ok-text);}
+.diag-score{font-family:var(--display);font-size:28px;font-weight:700;color:var(--accent);text-align:center;padding:10px 0;}
+.diag-loading{display:flex;align-items:center;gap:10px;padding:16px;color:var(--muted);font-size:12px;font-family:var(--mono);}
+.diag-loading-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1s infinite;}
+.diag-loading-dot:nth-child(2){animation-delay:.2s;}
+.diag-loading-dot:nth-child(3){animation-delay:.4s;}
+@keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+.diff-selector{display:flex;gap:6px;margin-bottom:14px;}
+.diff-btn{flex:1;padding:7px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--border);border-radius:var(--r);color:var(--muted);cursor:pointer;transition:all .15s;user-select:none;}
+.diff-btn:hover{border-color:var(--border-hi);color:var(--text);}
+.diff-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+
 /* Library */
 .lib-filter-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--muted);cursor:pointer;font-family:var(--mono);font-size:9px;letter-spacing:.05em;padding:4px 8px;text-transform:uppercase;transition:all .12s;user-select:none;}
 .lib-filter-btn:hover{border-color:var(--border-hi);color:var(--text);}
@@ -169,8 +241,51 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
 
 <header>
   <h1>WOD Designer</h1>
-  <p>// Analyse physiologique — formats & patterns — bibliotheque — v1.4</p>
+  <p>// Analyse physiologique — formats & patterns — bibliotheque — v1.5</p>
 </header>
+
+<!-- ===== SECTION APPRENDRE ===== -->
+<div class="learn-section">
+  <div class="learn-header" onclick="toggleLearn()">
+    <div class="learn-header-left">
+      <span class="learn-badge">Pedagogie</span>
+      <span class="learn-title">Apprendre a concevoir</span>
+    </div>
+    <span class="learn-toggle" id="learn-toggle-icon">Ouvrir +</span>
+  </div>
+  <div class="learn-body" id="learn-body">
+    <div class="learn-tabs">
+      <div class="learn-tab active" id="ltab-build" onclick="openLearnTab('build')">1 — Constructeur</div>
+      <div class="learn-tab" id="ltab-diag"  onclick="openLearnTab('diag')">2 — Diagnostic</div>
+    </div>
+
+    <!-- PANEL CONSTRUCTEUR -->
+    <div class="learn-panel show" id="lpanel-build">
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px">
+        Construis un WOD etape par etape en justifiant chaque decision. L outil valide ta logique avant d avancer. Si tu te trompes, il t explique pourquoi — sans te donner la reponse directement.
+      </div>
+      <div class="step-indicator" id="build-dots"></div>
+      <div id="build-step-area"></div>
+    </div>
+
+    <!-- PANEL DIAGNOSTIC -->
+    <div class="learn-panel" id="lpanel-diag">
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px">
+        Un WOD mal concu t est presente avec son intention declaree. Trouve les erreurs physiologiques avant de voir la correction. Genere par IA — chaque session est unique.
+      </div>
+      <div class="diff-selector">
+        <div class="diff-btn active" data-diff="debutant"      onclick="setDiagDiff('debutant')">Debutant</div>
+        <div class="diff-btn"        data-diff="intermediaire" onclick="setDiagDiff('intermediaire')">Intermediaire</div>
+        <div class="diff-btn"        data-diff="avance"        onclick="setDiagDiff('avance')">Avance</div>
+      </div>
+      <div id="diag-area">
+        <div style="text-align:center;padding:20px 0">
+          <div onclick="generateDiag()" class="step-btn" style="display:inline-block">Generer un WOD a diagnostiquer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="slabel">01 -- Format</div>
 <div class="fmt-grid">
@@ -855,6 +970,492 @@ var EXERCISES = [
 var EX_CATS = ['Gymnastics','Poids corps','Mono','Core Statique','Core Dynamique','Core Flexion','Core Anti-Ext','Core Anti-Rot','Core Charge','GPP / Mobilite'];
 var wodExercises = [];
 var libCatFilter = 'all';
+
+/* ===== LEARN SECTION ===== */
+
+/* --- Toggle learn section --- */
+var learnOpen = false;
+function toggleLearn() {
+  learnOpen = !learnOpen;
+  document.getElementById('learn-body').classList.toggle('open', learnOpen);
+  document.getElementById('learn-toggle-icon').textContent = learnOpen ? 'Fermer -' : 'Ouvrir +';
+  if (learnOpen && buildStep === 0) initBuild();
+}
+
+function openLearnTab(tab) {
+  document.getElementById('ltab-build').classList.toggle('active', tab==='build');
+  document.getElementById('ltab-diag').classList.toggle('active', tab==='diag');
+  document.getElementById('lpanel-build').classList.toggle('show', tab==='build');
+  document.getElementById('lpanel-diag').classList.toggle('show', tab==='diag');
+}
+
+/* =====================================================================
+   MECANISME 1 — CONSTRUCTEUR GUIDE
+===================================================================== */
+var buildStep = 0;
+var buildAnswers = {};
+var buildStepLocked = false;
+
+var BUILD_STEPS = [
+  {
+    id: 'filiere',
+    num: 'Etape 1 / 6',
+    q: 'Quel est ton objectif d adaptation physiologique ?',
+    hint: 'Tout part de la filiere energetique. C est elle qui dicte le ratio T:R, la duree effective et le format. Ne commence jamais par le format.',
+    type: 'choice',
+    choices: [
+      {val:'aerobic',    label:'Aerobie — VO2max, endurance cardio-vasculaire'},
+      {val:'lactate',    label:'Seuil lactique — tolerance a l effort soutenu'},
+      {val:'anaerobic',  label:'Anaerobie lactique — capacite et puissance'},
+      {val:'alactate',   label:'Phosphocreatine — puissance maximale explosive'}
+    ]
+  },
+  {
+    id: 'duree',
+    num: 'Etape 2 / 6',
+    q: 'Quelle duree de travail effectif minimum cette filiere necessite-t-elle ?',
+    hint: 'La duree effective = temps ou l athlete est reellement en effort. Pas la duree totale de la seance. Raisonne en minutes.',
+    type: 'number',
+    unit: 'minutes',
+    placeholder: 'Ex: 10',
+    validate: function(val, answers) {
+      var n = parseFloat(val);
+      var tgt = TARGETS[answers.filiere];
+      if (isNaN(n) || n <= 0) return {ok:false, msg:'Entrez une valeur numerique positive.'};
+      if (n < tgt.dur_min) return {ok:false, msg:'Trop bas. Pour la filiere ' + tgt.label + ', le minimum est ' + tgt.dur_min + ' min de travail effectif. En dessous, l adaptation ciblee n est pas atteinte — tu solicites une autre filiere.'};
+      if (n > tgt.dur_max) return {ok:false, msg:'Trop haut. Au-dela de ' + tgt.dur_max + ' min de travail effectif pour ' + tgt.label + ', tu depasses la zone d adaptation optimale et tu derives vers une autre filiere.'};
+      return {ok:true, msg:'Correct. ' + tgt.dur_min + ' a ' + tgt.dur_max + ' min de travail effectif = zone cible pour ' + tgt.label + '.'};
+    }
+  },
+  {
+    id: 'ratio',
+    num: 'Etape 3 / 6',
+    q: 'Quel ratio Travail:Repos cette filiere implique-t-elle ? (exprime comme T:R)',
+    hint: 'Le ratio T:R est le levier physiologique principal. Un ratio 1:1 = seuil lactique. Un ratio 1:5 = phosphocreatine. Raisonne par filiere, pas par habitude.',
+    type: 'ratio',
+    validate: function(t, r, answers) {
+      var tgt = TARGETS[answers.filiere];
+      if (!t || !r || isNaN(parseFloat(t)) || isNaN(parseFloat(r))) return {ok:false, msg:'Entrez deux valeurs numeriques pour T et R.'};
+      var ratio = parseFloat(t) / parseFloat(r);
+      var ratioMin = 1 / tgt.ratio_max;
+      var ratioMax = 1 / tgt.ratio_min;
+      if (answers.filiere === 'aerobic') { ratioMin = 0.5; ratioMax = 99; }
+      if (ratio < ratioMin * 0.6 || ratio > ratioMax * 1.6) {
+        return {ok:false, msg:'Ce ratio ne correspond pas a ' + tgt.label + '. Rappel : ' + tgt.label + ' => ratio T:R cible entre 1:' + tgt.ratio_max + ' et 1:' + tgt.ratio_min + '.'};
+      }
+      return {ok:true, msg:'Bon ratio pour ' + tgt.label + '. Le temps de repos n est pas du repos — c est une variable physiologique precisement calibree.'};
+    }
+  },
+  {
+    id: 'format',
+    num: 'Etape 4 / 6',
+    q: 'Quel format d entrainement produit le mieux ce ratio T:R sur cette duree ?',
+    hint: 'Certains formats imposent le ratio (intervals, EMOM), d autres le laissent a l athlete (AMRAP, For Time). Pour un ratio precis, le choix est contraint.',
+    type: 'choice',
+    choices: [
+      {val:'emom',      label:'EMOM — ratio controle par la duree de travail par minute'},
+      {val:'amrap',     label:'AMRAP — ratio libre, gere par l athlete'},
+      {val:'fortime',   label:'For Time — volume fixe, temps mesure'},
+      {val:'afap',      label:'AFAP — effort maximal sur volume fixe'},
+      {val:'intervals', label:'Intervals — ratio T:R explicitement programme'},
+      {val:'tabata',    label:'Tabata — 20s/10s x 8, ratio 2:1 fixe'},
+      {val:'chipper',   label:'Chipper — liste de mouvements en passage unique'},
+      {val:'buyin',     label:'Buy-In/Out — effort peripherique + WOD central'},
+      {val:'ladder',    label:'Ladder — volume variable par paliers'}
+    ],
+    validate: function(val, answers) {
+      var flt = answers.filiere;
+      var goodFormats = {
+        alactate:  ['emom','intervals'],
+        anaerobic: ['tabata','intervals','afap','fortime'],
+        lactate:   ['emom','intervals','amrap'],
+        aerobic:   ['amrap','fortime','chipper','buyin','ladder']
+      };
+      var good = goodFormats[flt] || [];
+      if (good.indexOf(val) !== -1) {
+        return {ok:true, msg:'Bon choix. Ce format permet de maintenir le ratio T:R et la duree effective compatibles avec ' + TARGETS[flt].label + '.'};
+      }
+      var FMT_NAMES = {emom:'EMOM',amrap:'AMRAP',fortime:'For Time',afap:'AFAP',intervals:'Intervals',tabata:'Tabata',chipper:'Chipper',buyin:'Buy-In/Out',ladder:'Ladder'};
+      return {ok:false, msg:'Ce format n est pas optimal pour ' + TARGETS[flt].label + '. Les formats les mieux adaptes sont : ' + good.map(function(f){ return FMT_NAMES[f]; }).join(', ') + '. Raison : ils permettent de controler ou de maintenir le ratio T:R cible.'};
+    }
+  },
+  {
+    id: 'patterns',
+    num: 'Etape 5 / 6',
+    q: 'Quels patterns de mouvement choisis-tu pour ce WOD ? (selectionne 2 a 3)',
+    hint: 'Pense en termes d interferences. Deux patterns qui partagent les memes muscles = recuperation incomplete entre les efforts. Pour un ratio T:R serre, les interferences doivent etre minimales.',
+    type: 'multicheck',
+    choices: [
+      {val:'squat',   label:'Squat — quad dominant'},
+      {val:'hinge',   label:'Hinge — chaine posterieure'},
+      {val:'push_h',  label:'Poussee horizontale — pec, tricep'},
+      {val:'push_v',  label:'Poussee verticale — deltoide, tricep'},
+      {val:'pull_h',  label:'Traction horizontale — grand dorsal, bicep'},
+      {val:'pull_v',  label:'Traction verticale — grand dorsal, bicep'},
+      {val:'olympic', label:'Haltero olympique — chaine complete'},
+      {val:'mono',    label:'Mono-structural — cardio pur'},
+      {val:'core_flex',label:'Core — gainage et flexion'},
+      {val:'lunge',   label:'Fente — quad unilateral'},
+      {val:'jump',    label:'Saut / Plyometrie — puissance basse chaine'},
+      {val:'carry',   label:'Porter / Carry — stabilite globale'}
+    ]
+  },
+  {
+    id: 'synthese',
+    num: 'Etape 6 / 6',
+    q: 'Synthese — ton WOD est construit.',
+    type: 'summary'
+  }
+];
+
+var buildMultiCheck = [];
+
+function initBuild() {
+  buildStep = 0;
+  buildAnswers = {};
+  buildMultiCheck = [];
+  buildStepLocked = false;
+  renderBuildStep();
+}
+
+function renderBuildStep() {
+  var steps = BUILD_STEPS;
+  var dots = '';
+  for (var i = 0; i < steps.length; i++) {
+    var cls = 'step-dot';
+    if (i < buildStep) cls += ' done';
+    else if (i === buildStep) cls += ' current';
+    dots += '<div class="' + cls + '"></div>';
+  }
+  document.getElementById('build-dots').innerHTML = dots;
+
+  var step = steps[buildStep];
+  if (!step) return;
+
+  var html = '<div class="step-card">';
+  html += '<div class="step-num">' + step.num + '</div>';
+  html += '<div class="step-q">' + step.q + '</div>';
+  if (step.hint) html += '<div class="step-hint">' + step.hint + '</div>';
+
+  if (step.type === 'choice') {
+    html += '<div class="step-choices">';
+    for (var j = 0; j < step.choices.length; j++) {
+      var c = step.choices[j];
+      html += '<div class="step-choice" onclick="buildChoose(\'' + c.val + '\')">' + c.label + '</div>';
+    }
+    html += '</div>';
+
+  } else if (step.type === 'number') {
+    html += '<div class="step-input-row">';
+    html += '<input type="number" id="build-num-input" class="step-input" placeholder="' + (step.placeholder||'') + '" min="0" max="120">';
+    html += '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">' + (step.unit||'') + '</span>';
+    html += '<div class="step-btn" onclick="buildSubmitNumber()">Valider</div>';
+    html += '</div>';
+
+  } else if (step.type === 'ratio') {
+    html += '<div class="step-input-row">';
+    html += '<input type="number" id="build-ratio-t" class="step-input" placeholder="T" min="0" max="120" style="width:70px">';
+    html += '<span style="font-family:var(--mono);font-size:13px;color:var(--muted);padding:0 4px">:</span>';
+    html += '<input type="number" id="build-ratio-r" class="step-input" placeholder="R" min="0" max="120" style="width:70px">';
+    html += '<div class="step-btn" onclick="buildSubmitRatio()">Valider</div>';
+    html += '</div>';
+
+  } else if (step.type === 'multicheck') {
+    html += '<div class="step-choices" id="build-multi-choices">';
+    for (var k = 0; k < step.choices.length; k++) {
+      var mc = step.choices[k];
+      html += '<div class="step-choice" id="bmc-' + mc.val + '" onclick="buildTogglePattern(\'' + mc.val + '\')">' + mc.label + '</div>';
+    }
+    html += '</div>';
+    html += '<div style="margin-top:10px;display:flex;gap:8px">';
+    html += '<div class="step-btn" onclick="buildSubmitPatterns()">Valider la selection</div>';
+    html += '</div>';
+
+  } else if (step.type === 'summary') {
+    html += renderBuildSummary();
+    html += '<div style="display:flex;gap:8px;margin-top:14px">';
+    html += '<div class="step-btn" onclick="initBuild()">Recommencer</div>';
+    html += '</div>';
+  }
+
+  html += '<div id="build-feedback"></div>';
+  html += '</div>';
+  document.getElementById('build-step-area').innerHTML = html;
+}
+
+function buildChoose(val) {
+  if (buildStepLocked) return;
+  var step = BUILD_STEPS[buildStep];
+  if (step.validate) {
+    var result = step.validate(val, buildAnswers);
+    showBuildFeedback(result);
+    if (!result.ok) return;
+  }
+  buildAnswers[step.id] = val;
+  buildStepLocked = true;
+  setTimeout(function() {
+    buildStepLocked = false;
+    buildStep++;
+    if (buildStep >= BUILD_STEPS.length) buildStep = BUILD_STEPS.length - 1;
+    renderBuildStep();
+  }, 1400);
+}
+
+function buildSubmitNumber() {
+  var step = BUILD_STEPS[buildStep];
+  var val = document.getElementById('build-num-input').value;
+  if (step.validate) {
+    var result = step.validate(val, buildAnswers);
+    showBuildFeedback(result);
+    if (!result.ok) return;
+    buildAnswers[step.id] = parseFloat(val);
+    buildStepLocked = true;
+    setTimeout(function() { buildStepLocked = false; buildStep++; renderBuildStep(); }, 1600);
+  }
+}
+
+function buildSubmitRatio() {
+  var step = BUILD_STEPS[buildStep];
+  var t = document.getElementById('build-ratio-t').value;
+  var r = document.getElementById('build-ratio-r').value;
+  if (step.validate) {
+    var result = step.validate(t, r, buildAnswers);
+    showBuildFeedback(result);
+    if (!result.ok) return;
+    buildAnswers[step.id] = t + ':' + r;
+    buildStepLocked = true;
+    setTimeout(function() { buildStepLocked = false; buildStep++; renderBuildStep(); }, 1600);
+  }
+}
+
+function buildTogglePattern(val) {
+  var idx = buildMultiCheck.indexOf(val);
+  var el = document.getElementById('bmc-' + val);
+  if (idx === -1) {
+    buildMultiCheck.push(val);
+    if (el) el.classList.add('selected');
+  } else {
+    buildMultiCheck.splice(idx, 1);
+    if (el) el.classList.remove('selected');
+  }
+}
+
+function buildSubmitPatterns() {
+  if (buildMultiCheck.length < 2) {
+    showBuildFeedback({ok:false, msg:'Selectionne au moins 2 patterns. Un WOD avec un seul pattern manque de variation et d interet metabolique.'});
+    return;
+  }
+  if (buildMultiCheck.length > 4) {
+    showBuildFeedback({ok:false, msg:'Trop de patterns (' + buildMultiCheck.length + '). Au-dela de 4 patterns distincts, tu perds la coherence du WOD et la fatigue devient difficile a gerer. Reduis a 2-3.'});
+    return;
+  }
+  var conflicts = [];
+  for (var a = 0; a < buildMultiCheck.length; a++) {
+    for (var b = a+1; b < buildMultiCheck.length; b++) {
+      var pA = getPattern(buildMultiCheck[a]);
+      var pB = getPattern(buildMultiCheck[b]);
+      if (!pA || !pB) continue;
+      var shared = [];
+      for (var m = 0; m < pA.muscles.length; m++) {
+        if (pB.muscles.indexOf(pA.muscles[m]) !== -1) shared.push(pA.muscles[m]);
+      }
+      if (shared.length >= 2) conflicts.push(pA.name + ' + ' + pB.name + ' partagent : ' + shared.join(', '));
+    }
+  }
+  var flt = buildAnswers.filiere;
+  var isHighRatio = (flt === 'alactate' || flt === 'anaerobic');
+  if (conflicts.length > 0 && isHighRatio) {
+    showBuildFeedback({ok:false, msg:'Interference elevee detectee : ' + conflicts.join(' | ') + '. Pour une filiere ' + TARGETS[flt].label + ' avec ratio T:R serre, ces interferences compromettent la recuperation. Choisis des patterns antagonistes.'});
+    return;
+  }
+  var msg = 'Selection valide.';
+  if (conflicts.length > 0) msg += ' Interference moderee : ' + conflicts.join('. ') + '. Acceptable pour ta filiere mais surveille la fatigue locale.';
+  else msg += ' Aucune interference elevee. Bonne gestion des patterns.';
+  showBuildFeedback({ok:true, msg:msg});
+  buildAnswers.patterns = buildMultiCheck.slice();
+  buildStepLocked = true;
+  setTimeout(function() { buildStepLocked = false; buildStep++; renderBuildStep(); }, 1800);
+}
+
+function showBuildFeedback(result) {
+  var cls = result.ok ? 'ok' : 'bad';
+  var el = document.getElementById('build-feedback');
+  if (el) el.innerHTML = '<div class="step-feedback ' + cls + '">' + result.msg + '</div>';
+}
+
+function renderBuildSummary() {
+  var a = buildAnswers;
+  var FMT_NAMES = {emom:'EMOM',amrap:'AMRAP',fortime:'For Time',afap:'AFAP',intervals:'Intervals',tabata:'Tabata',chipper:'Chipper',buyin:'Buy-In/Out',ladder:'Ladder'};
+  var patNames = (a.patterns||[]).map(function(pid){ var p=getPattern(pid); return p?p.name:pid; }).join(' + ');
+  var tgt = TARGETS[a.filiere] || {};
+  var html = '<div class="step-summary">';
+  html += '<div class="step-summary-row"><span class="step-summary-key">Filiere</span><span class="step-summary-val">' + (tgt.label||'') + '</span></div>';
+  html += '<div class="step-summary-row"><span class="step-summary-key">Duree effective</span><span class="step-summary-val">' + (a.duree||'') + ' min</span></div>';
+  html += '<div class="step-summary-row"><span class="step-summary-key">Ratio T:R</span><span class="step-summary-val">' + (a.ratio||'') + '</span></div>';
+  html += '<div class="step-summary-row"><span class="step-summary-key">Format</span><span class="step-summary-val">' + (FMT_NAMES[a.format]||a.format||'') + '</span></div>';
+  html += '<div class="step-summary-row"><span class="step-summary-key">Patterns</span><span class="step-summary-val">' + (patNames||'') + '</span></div>';
+  html += '</div>';
+  html += '<div style="margin-top:10px;font-size:12px;color:var(--muted);line-height:1.6">Tu as justifie chaque decision. Ce WOD n est pas le fruit d une habitude — c est le resultat d une demarche physiologique. C est exactement ce qu on te demande de defendre a l oral.</div>';
+  return html;
+}
+
+/* =====================================================================
+   MECANISME 2 — DIAGNOSTIC IA
+===================================================================== */
+var diagDiff = 'debutant';
+var diagChecked = [];
+var diagData = null;
+
+function setDiagDiff(diff) {
+  diagDiff = diff;
+  document.querySelectorAll('.diff-btn').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-diff') === diff);
+  });
+}
+
+function generateDiag() {
+  var area = document.getElementById('diag-area');
+  area.innerHTML = '<div class="diag-loading"><div class="diag-loading-dot"></div><div class="diag-loading-dot"></div><div class="diag-loading-dot"></div><span>Generation du WOD en cours...</span></div>';
+  diagChecked = [];
+  diagData = null;
+
+  var diffInstructions = {
+    debutant:      'Cree un WOD avec 2 erreurs evidentes et faciles a reperer (ex: mauvais format pour la filiere, ratio T:R completement inadequat).',
+    intermediaire: 'Cree un WOD avec 2-3 erreurs dont au moins une subtile (ex: volume effectif insuffisant, interference de patterns sous-estimee).',
+    avance:        'Cree un WOD qui semble correct en surface mais contient 3 erreurs cachees (ex: derive de filiere, interferences croisees, volume effectif hors zone malgre un format correct).'
+  };
+
+  var prompt = 'Tu es un expert en preparation physique CrossFit Level 4. Genere un WOD intentionnellement mal concu pour un exercice de diagnostic pedagogique.\n\n' +
+    'Niveau de difficulte : ' + diagDiff + '\n' +
+    diffInstructions[diagDiff] + '\n\n' +
+    'Reponds UNIQUEMENT en JSON valide, sans markdown, sans commentaire, avec exactement cette structure :\n' +
+    '{\n' +
+    '  "wod": "description complete du WOD (format, exercices, sets/reps, charges)",\n' +
+    '  "intention": "objectif declare par le coach qui a concu ce WOD",\n' +
+    '  "suspects": [\n' +
+    '    {"id":"s1","text":"description d une erreur potentielle a evaluer"},\n' +
+    '    {"id":"s2","text":"description d une erreur potentielle a evaluer"},\n' +
+    '    {"id":"s3","text":"description d une erreur potentielle a evaluer"},\n' +
+    '    {"id":"s4","text":"description d une erreur potentielle a evaluer"},\n' +
+    '    {"id":"s5","text":"description d une erreur potentielle a evaluer"}\n' +
+    '  ],\n' +
+    '  "real_errors": ["s1","s3"],\n' +
+    '  "explanations": {\n' +
+    '    "s1": "explication physiologique precise de pourquoi c est une erreur",\n' +
+    '    "s3": "explication physiologique precise de pourquoi c est une erreur"\n' +
+    '  }\n' +
+    '}\n\n' +
+    'Les suspects doivent melanger vraies erreurs et distracteurs plausibles. Les explications doivent etre pedagogiques et ancrees dans la physiologie de l effort.';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    var raw = '';
+    for (var i = 0; i < data.content.length; i++) {
+      if (data.content[i].type === 'text') raw += data.content[i].text;
+    }
+    raw = raw.replace(/```json/g,'').replace(/```/g,'').trim();
+    diagData = JSON.parse(raw);
+    renderDiag();
+  })
+  .catch(function(err) {
+    document.getElementById('diag-area').innerHTML = '<div class="step-feedback bad">Erreur de generation : ' + err.message + '. Verifie ta connexion internet.</div><div style="margin-top:10px;text-align:center"><div onclick="generateDiag()" class="step-btn" style="display:inline-block">Reessayer</div></div>';
+  });
+}
+
+function renderDiag() {
+  if (!diagData) return;
+  var html = '';
+  html += '<div class="diag-wod">';
+  html += '<div class="diag-wod-label">WOD a diagnostiquer</div>';
+  html += '<div class="diag-wod-content">' + diagData.wod.replace(/\n/g,'<br>') + '</div>';
+  html += '<div class="diag-wod-intent">Intention declaree : ' + diagData.intention + '</div>';
+  html += '</div>';
+  html += '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;text-transform:uppercase">Identifie les erreurs (coche tout ce qui te semble faux)</div>';
+  html += '<div class="diag-error-list" id="diag-suspects">';
+  for (var i = 0; i < diagData.suspects.length; i++) {
+    var s = diagData.suspects[i];
+    html += '<div class="diag-error-item" id="ds-' + s.id + '" onclick="toggleDiagSuspect(\'' + s.id + '\')">';
+    html += '<div class="diag-cb"></div>';
+    html += '<div class="diag-error-text">' + s.text + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<div style="display:flex;gap:8px;margin-bottom:10px">';
+  html += '<div class="step-btn" onclick="revealDiag()">Voir la correction</div>';
+  html += '<div class="step-btn secondary" onclick="generateDiag()">Nouveau WOD</div>';
+  html += '</div>';
+  html += '<div id="diag-reveal-area"></div>';
+  document.getElementById('diag-area').innerHTML = html;
+}
+
+function toggleDiagSuspect(id) {
+  var idx = diagChecked.indexOf(id);
+  var el = document.getElementById('ds-' + id);
+  if (idx === -1) {
+    diagChecked.push(id);
+    if (el) { el.classList.add('checked'); el.querySelector('.diag-cb').textContent = 'v'; }
+  } else {
+    diagChecked.splice(idx, 1);
+    if (el) { el.classList.remove('checked'); el.querySelector('.diag-cb').textContent = ''; }
+  }
+}
+
+function revealDiag() {
+  if (!diagData) return;
+  var real = diagData.real_errors || [];
+  var explanations = diagData.explanations || {};
+  var correctFound = 0;
+  var missed = [];
+  var falsePositives = 0;
+
+  for (var i = 0; i < real.length; i++) {
+    if (diagChecked.indexOf(real[i]) !== -1) correctFound++;
+    else missed.push(real[i]);
+  }
+  for (var j = 0; j < diagChecked.length; j++) {
+    if (real.indexOf(diagChecked[j]) === -1) falsePositives++;
+  }
+
+  var score = Math.round((correctFound / real.length) * 100);
+  var html = '<div class="diag-reveal">';
+  html += '<div class="diag-reveal-title">Correction</div>';
+  html += '<div class="diag-score">' + score + '%</div>';
+
+  for (var k = 0; k < real.length; k++) {
+    var sid = real[k];
+    var found = diagChecked.indexOf(sid) !== -1;
+    var suspect = null;
+    for (var s = 0; s < diagData.suspects.length; s++) {
+      if (diagData.suspects[s].id === sid) { suspect = diagData.suspects[s]; break; }
+    }
+    if (found) {
+      html += '<div class="diag-error-revealed real"><strong>Bonne detection :</strong> ' + (suspect?suspect.text:'') + '<br><span style="opacity:.8">' + (explanations[sid]||'') + '</span></div>';
+    } else {
+      html += '<div class="diag-error-revealed missed"><strong>Erreur manquee :</strong> ' + (suspect?suspect.text:'') + '<br><span style="opacity:.8">' + (explanations[sid]||'') + '</span></div>';
+    }
+  }
+
+  if (falsePositives > 0) {
+    html += '<div class="diag-error-revealed correct" style="background:rgba(80,160,255,0.08);color:var(--blue-text);border-left-color:var(--blue-text)"><strong>' + falsePositives + ' faux positif(s)</strong> — tu as identifie des erreurs qui n en sont pas. C est un signal : reverifie ta base physiologique sur ces points.</div>';
+  }
+
+  html += '<div style="margin-top:12px;display:flex;gap:8px">';
+  html += '<div class="step-btn" onclick="generateDiag()">Nouveau WOD</div>';
+  html += '</div>';
+  html += '</div>';
+  document.getElementById('diag-reveal-area').innerHTML = html;
+}
+
+
 
 function loadCustomExercises() {
   try {
