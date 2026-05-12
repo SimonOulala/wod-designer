@@ -241,7 +241,7 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
 
 <header>
   <h1>WOD Designer</h1>
-  <p>// Analyse physiologique — formats & patterns — bibliotheque — v1.5</p>
+  <p>// Analyse physiologique — formats & patterns — bibliotheque — v1.6</p>
 </header>
 
 <!-- ===== SECTION APPRENDRE ===== -->
@@ -971,6 +971,890 @@ var EX_CATS = ['Gymnastics','Poids corps','Mono','Core Statique','Core Dynamique
 var wodExercises = [];
 var libCatFilter = 'all';
 
+var DIAG_BANK = [
+
+/* ================================================================
+   DEBUTANT (1-2 erreurs evidentes)
+================================================================ */
+{diff:'debutant',
+ wod:'Tabata Thruster @ 80% 1RM\n8 rounds : 20s effort / 10s repos',
+ intention:'Developper la puissance maximale explosive (filiere phosphocreatine)',
+ suspects:[
+   {id:'s1',text:'Le ratio 2:1 est trop eleve pour la filiere phosphocreatine'},
+   {id:'s2',text:'Le Tabata est un format inadapte pour la puissance max'},
+   {id:'s3',text:'La charge de 80% 1RM est trop lourde pour maintenir une cadence Tabata'},
+   {id:'s4',text:'La duree totale de 4 min est insuffisante pour la filiere aerobie'},
+   {id:'s5',text:'Le Thruster est un mauvais choix de mouvement pour ce format'}
+ ],
+ real_errors:['s1','s3'],
+ explanations:{
+   s1:'La phosphocreatine necessite un ratio T:R de 1:5 a 1:8 pour permettre la resynthese complete. Un ratio 2:1 genere une accumulation de fatigue incompatible avec la puissance maximale.',
+   s3:'A 80% 1RM, le Thruster ne peut pas etre execute a frequence Tabata sans effondrement technique des le round 3-4. La phosphocreatine implique des efforts de 5-10s max, pas 20s avec charge lourde.'
+ }
+},
+
+{diff:'debutant',
+ wod:'AMRAP 25 min\n5 Power Snatch @ 70% 1RM\n10 Box Jumps (60cm)\n15 Pull-Ups',
+ intention:'Travail du seuil lactique sur filiere mixte',
+ suspects:[
+   {id:'s1',text:'Le Power Snatch a 70% 1RM est inadapte a un format AMRAP long'},
+   {id:'s2',text:'25 min depasse la zone optimale du seuil lactique'},
+   {id:'s3',text:'Le Box Jump et le Pull-Up creent une interference elevee'},
+   {id:'s4',text:'Le volume de 15 pull-ups par round est trop eleve pour un AMRAP'},
+   {id:'s5',text:'Ce WOD cible en realite la filiere aerobie, pas le seuil lactique'}
+ ],
+ real_errors:['s1','s5'],
+ explanations:{
+   s1:'Le snatch a 70% requiert une pleine lucidite neuromusculaire. Sur 25 min d AMRAP, la fatigue systemique va degrader la technique et augmenter massivement le risque de blessure. Ce mouvement technique exige un repos structure — EMOM ou intervals.',
+   s5:'25 min de travail continu cible la filiere aerobie (VO2max), pas le seuil lactique. Le seuil lactique se travaille entre 6 et 20 min d effort effectif avec un ratio T:R autour de 1:1.'
+ }
+},
+
+{diff:'debutant',
+ wod:'For Time\n100 Burpees\n100 Air Squats\n100 Sit-Ups\n100 Push-Ups',
+ intention:'Seance de force-endurance sur filiere aerobie, duree cible 10 min',
+ suspects:[
+   {id:'s1',text:'Le volume total (400 reps) est incompatible avec une duree cible de 10 min'},
+   {id:'s2',text:'Les Burpees et les Push-Ups creent une interference elevee'},
+   {id:'s3',text:'L air squat est un mauvais choix pour la force-endurance'},
+   {id:'s4',text:'Ce WOD ciblera en realite un effort de 30-50 min pour la majorite des athletes'},
+   {id:'s5',text:'Les sit-ups sont contre-indiques en volume eleve'}
+ ],
+ real_errors:['s1','s2','s4'],
+ explanations:{
+   s1:'400 reps au poids de corps representent 35-50 min de travail pour un athlete de niveau intermediaire. La duree cible de 10 min est completement deconnectee du volume prescrit.',
+   s2:'Burpees = push-up + saut. Push-Ups = push horizontal. Les deux sollicitent intensement pec, tricep, deltoide anterieur. Sur 100+100 reps dans le meme WOD, c est une surcharge locale massive sur le buste anterieur.',
+   s4:'Pour la majorite des athletes, ce chipper durera 30-50 min, ce qui derive vers un effort de capacite aerobie longue, loin de la force-endurance declaree.'
+ }
+},
+
+{diff:'debutant',
+ wod:'E1MOM x 20 min\nMin 1-10 : 10 Deadlifts @ 85% 1RM\nMin 11-20 : 10 Box Jumps (70cm)',
+ intention:'Developpement de la puissance de la chaine posterieure',
+ suspects:[
+   {id:'s1',text:'10 reps a 85% 1RM en 60 secondes est physiologiquement impossible a maintenir'},
+   {id:'s2',text:'Le Box Jump et le Deadlift partagent la chaine posterieure — interference elevee'},
+   {id:'s3',text:'Le format EMOM est inadapte pour le deadlift lourd'},
+   {id:'s4',text:'20 rounds totaux cree un volume excessif pour ces intensites'},
+   {id:'s5',text:'La recuperation entre rounds est insuffisante pour maintenir la qualite technique'}
+ ],
+ real_errors:['s1','s4','s5'],
+ explanations:{
+   s1:'A 85% 1RM, 10 deadlifts representent un effort sous-maximal majeur. En laissant 60s par round, il reste a peine 15-20s de repos apres les reps. Des le round 3-4, la fatigue compromet la technique et le risque de blessure lombaire devient critique.',
+   s4:'10 rounds de deadlift a 85% = 100 reps a intensite elevee. C est un volume qui depasse massivement les recommandations pour les mouvements lourds techniques en contexte metcon.',
+   s5:'E1MOM avec 10 reps lourdes laisse trop peu de repos. Pour du travail de force, l E2MOM ou E3MOM est necessaire pour maintenir la qualite et la puissance a chaque set.'
+ }
+},
+
+{diff:'debutant',
+ wod:'Tabata Deadlift @ 60% 1RM\n8 rounds : 20s / 10s\nSuivi de : Tabata Pull-Up\n8 rounds : 20s / 10s',
+ intention:'Developpement de la force-endurance du dos et des ischio-jambiers',
+ suspects:[
+   {id:'s1',text:'Le Deadlift est inadapte au format Tabata en raison du risque technique sous fatigue'},
+   {id:'s2',text:'Le Tabata Pull-Up apres Tabata Deadlift cree une surcharge sur grand dorsal et bicep'},
+   {id:'s3',text:'Le ratio 2:1 correspond au seuil lactique, pas a la force-endurance'},
+   {id:'s4',text:'La duree totale de 8 min est trop courte pour la filiere aerobie'},
+   {id:'s5',text:'60% 1RM est trop leger pour le Deadlift'}
+ ],
+ real_errors:['s1','s2'],
+ explanations:{
+   s1:'Le Deadlift exige une position de dos neutral a chaque rep. A haute cadence sous fatigue Tabata, la degradation de la position du dos est quasi-certaine a partir du round 4-5. Le risque lombaire est majeur. Reserve le Tabata aux mouvements simples : air squat, push-up, row, bike.',
+   s2:'Le Deadlift recrute massivement le grand dorsal comme stabilisateur. Les Pull-Ups le recrutent comme moteur principal. Enchainer les deux Tabatas = cumulation de fatigue intense sur les memes groupes musculaires sans recuperation. Resultat : chute de performance et risque de blessure.'
+ }
+},
+
+{diff:'debutant',
+ wod:'For Time — 21-15-9\nBack Squat @ 100kg\nHandstand Push-Ups',
+ intention:'Benchmark de force-endurance type Fran sur filiere anaerobie lactique',
+ suspects:[
+   {id:'s1',text:'Le Back Squat a la barre est inadapte a un format For Time a repetitions elevees'},
+   {id:'s2',text:'L interference entre back squat et HSPU est elevee'},
+   {id:'s3',text:'100kg est une charge trop standardisee — non adaptee aux niveaux des athletes'},
+   {id:'s4',text:'La structure 21-15-9 est inadaptee au back squat lourd'},
+   {id:'s5',text:'Le HSPU et le back squat partagent trop de muscles pour un couplet'}
+ ],
+ real_errors:['s1','s4'],
+ explanations:{
+   s1:'Le Back Squat necessite un rack, un placement precis et une sortie de barre securisee. En conditions de fatigue et de pression temporelle (For Time), le risque de re-rack hasardeux est eleve. Les benchmarks For Time utilisent le Front Squat, le Goblet Squat ou le Thruster — jamais le Back Squat lourd.',
+   s4:'21 reps de back squat a 100kg represente un set quasi-maximal pour la plupart des athletes. La structure 21-15-9 implique de repartir sur le premier set sans repos impose. Le resultat est une fragmentation severe des les premieres reps et un effondrement technique garantis.'
+ }
+},
+
+{diff:'debutant',
+ wod:'AMRAP 5 min\n3 Muscle-Ups (anneaux)\n6 Deadlifts @ 110kg\n9 Box Jumps (60cm)',
+ intention:'Developpement aerobie sur un triplet technique',
+ suspects:[
+   {id:'s1',text:'5 min est insuffisant pour developper la filiere aerobie'},
+   {id:'s2',text:'Le Muscle-Up est trop technique pour un format AMRAP'},
+   {id:'s3',text:'Le Deadlift lourd et le Muscle-Up creent une interference sur le grand dorsal'},
+   {id:'s4',text:'La charge du Deadlift est trop elevee pour un AMRAP'},
+   {id:'s5',text:'Ce WOD cible en realite l anaerobie lactique, pas l aerobie'}
+ ],
+ real_errors:['s1','s5'],
+ explanations:{
+   s1:'5 min de travail continu cible la filiere anaerobie lactique (2-8 min). La filiere aerobie necessite un minimum de 10 min de travail effectif pour generer une adaptation cardiovasculaire significative.',
+   s5:'Un AMRAP 5 min a haute intensite avec mouvements techniques et charges lourdes sollicite principalement la capacite anaerobie lactique. Le deplacement vers la filiere aerobie necessite une duree minimale de 10-15 min et une intensite moderee.'
+ }
+},
+
+{diff:'debutant',
+ wod:'E2MOM x 20 min\n5 Snatch @ 85% 1RM\n5 Chest-to-Bar Pull-Ups',
+ intention:'Amelioration technique du snatch sous legere fatigue',
+ suspects:[
+   {id:'s1',text:'85% 1RM est trop lourd pour travailler la technique sous fatigue'},
+   {id:'s2',text:'Le C2B Pull-Up fatigue les muscles stabilisateurs du snatch'},
+   {id:'s3',text:'E2MOM ne laisse pas assez de repos pour 5 reps a 85%'},
+   {id:'s4',text:'Le volume de 5 reps par set est trop eleve pour l haltero a cette intensite'},
+   {id:'s5',text:'Associer snatch et pull-up dans un EMOM est toujours une erreur'}
+ ],
+ real_errors:['s1','s4'],
+ explanations:{
+   s1:'Le travail technique se fait entre 60 et 75% 1RM maximum. A 85%, la charge est trop proche du maximum pour permettre les corrections techniques. L athlete est en mode survie, pas en mode apprentissage. Pour du conditionnement technique : 65-72%.',
+   s4:'5 reps a 85% 1RM en snatch represente un effort de force pure, pas de la technique sous fatigue. En haltero olympique, le travail technique se fait generalement sur des sets de 1 a 3 reps. 5 reps a cette intensite accumule trop de fatigue SNC pour maintenir la qualite technique.'
+ }
+},
+
+{diff:'debutant',
+ wod:'For Time\n400m Run\n21 Thrusters @ 43kg\n400m Run\n15 Thrusters @ 43kg\n400m Run\n9 Thrusters @ 43kg\n400m Run',
+ intention:'Travail de capacite aerobie et force-endurance',
+ suspects:[
+   {id:'s1',text:'Le Run et le Thruster creent une interference sur les quadriceps'},
+   {id:'s2',text:'La charge de 43kg est trop lourde pour un WOD de cette duree'},
+   {id:'s3',text:'Alterner run et Thrusters est inefficace pedagogiquement'},
+   {id:'s4',text:'Ce WOD est en realite bien concu — aucune erreur majeure'},
+   {id:'s5',text:'Les runs entre les sets de Thrusters font baisser l intensite et derivent vers l aerobie long'}
+ ],
+ real_errors:['s1','s5'],
+ explanations:{
+   s1:'Le run sollicite massivement les quadriceps (propulsion) et les mollets. Le Thruster est quad-dominant. Sur 4 runs et 45 Thrusters, la fatigue locale des quadriceps s accumule sans recuperation adequate, limitant la puissance sur les Thrusters et la vitesse de course.',
+   s5:'Les runs de 400m servent de recuperation active entre les sets de Thrusters, ce qui fait baisser l intensite cardiaque sous le seuil lactique. La seance derive vers un effort aerobie long (25-35 min) plutot qu une vraie solicitation anaerobie comme le suggere la structure 21-15-9.'
+ }
+},
+
+{diff:'debutant',
+ wod:'Tabata Burpees\n8 rounds : 20s / 10s\nImmediatement suivi de\nTabata Air Squats\n8 rounds : 20s / 10s\nImmediatement suivi de\nTabata Push-Ups\n8 rounds : 20s / 10s',
+ intention:'Circuit metabolique de 12 min pour la filiere anaerobie lactique',
+ suspects:[
+   {id:'s1',text:'Trois Tabatas consecutifs sans repos derivent vers la filiere aerobie longue'},
+   {id:'s2',text:'Les Burpees et les Push-Ups partagent le pattern de poussee horizontale'},
+   {id:'s3',text:'Le Tabata Air Squat est inadapte entre des mouvements de buste'},
+   {id:'s4',text:'12 min total depasse la zone optimale de l anaerobie lactique'},
+   {id:'s5',text:'L intensite va inevitablement chuter sur le 2e et 3e Tabata'}
+ ],
+ real_errors:['s2','s4','s5'],
+ explanations:{
+   s2:'Burpees incluent un push-up complet. Enchainer avec un Tabata Push-Ups = cumulation de fatigue majeure sur pec, tricep, deltoide anterieur. Sans recuperation entre les deux, le Tabata Push-Ups sera de tres mauvaise qualite des le round 2.',
+   s4:'3 Tabatas consecutifs = 12 min de travail quasi-continu. La zone optimale de l anaerobie lactique est de 2 a 8 min. Au-dela, on derive vers le seuil lactique ou l aerobie. Ce WOD est en realite un travail de capacite aerobie deguise.',
+   s5:'Sans repos entre les Tabatas, l intensite sur le 2e Tabata (Air Squat) sera 20-30% inferieure au 1er, et encore moins sur le 3e. Le principe du Tabata (effort supramaximal) ne peut pas etre maintenu sur 3 blocs consecutifs.'
+ }
+},
+
+/* ================================================================
+   INTERMEDIAIRE (2-3 erreurs dont une subtile)
+================================================================ */
+{diff:'intermediaire',
+ wod:'E1MOM x 15 min\nMin impaires : 8 Thrusters @ 50kg\nMin paires : 12 Toes-to-Bar',
+ intention:'Developpement du seuil lactique sur un couplet haltero-gymnastics',
+ suspects:[
+   {id:'s1',text:'Le ratio T:R effectif est trop favorable — recuperation trop longue pour le seuil lactique'},
+   {id:'s2',text:'Le volume de travail effectif est insuffisant pour le seuil lactique'},
+   {id:'s3',text:'Les Thrusters et les T2B creent une interference sur les flechisseurs de hanche'},
+   {id:'s4',text:'8 Thrusters a 50kg prend ~30s, laissant 30s de repos — ratio 1:1 correct'},
+   {id:'s5',text:'Les T2B ne sont pas un pattern adapte au seuil lactique'}
+ ],
+ real_errors:['s2','s3'],
+ explanations:{
+   s2:'15 rounds x 30s de travail = 7.5 min de travail effectif total. La zone du seuil lactique commence a 6 min — on est en bas de fourchette. Pour une adaptation seuil robuste, vise 10-15 min de travail effectif. Solution : passer a E1MOM x 20-25 min ou augmenter le volume par round.',
+   s3:'Le Thruster sollicite massivement les flechisseurs de hanche dans la phase squat. Les T2B exigent une compression extreme des flechisseurs de hanche (iliopsoas, droit femoral). Alterner les deux sans repos suffisant cree une fatigue locale rapide sur ces flechisseurs, degradant la qualite des T2B et la profondeur du squat dans le Thruster.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'5 rounds For Time\n400m Run\n15 Overhead Squats @ 40kg\n12 Ring Dips',
+ intention:'Seance de force-endurance sur filiere lactique, duree cible 20 min',
+ suspects:[
+   {id:'s1',text:'L OHS a 40kg est trop technique pour un WOD For Time multi-rounds'},
+   {id:'s2',text:'Le Ring Dip apres OHS cree une interference sur les stabilisateurs d epaule'},
+   {id:'s3',text:'5 rounds de 400m Run representent 2km de course — derive vers l endurance aerobie'},
+   {id:'s4',text:'La duree reelle de ce WOD sera probablement 28-40 min, pas 20 min'},
+   {id:'s5',text:'Le Run et l OHS partagent une forte demande sur les quadriceps'}
+ ],
+ real_errors:['s2','s4'],
+ explanations:{
+   s2:'L OHS necessite une stabilisation active permanente de l epaule (coiffe des rotateurs, trapeze superieur, deltoide). Le Ring Dip sollicite intensement ces memes stabilisateurs plus le tricep et le pec. Enchainer les deux sans repos = surcharge des stabilisateurs d epaule et risque de blessure majore.',
+   s4:'5 x (400m run + 15 OHS + 12 ring dips) pour un athlete intermediaire = 32-45 min. La filiere lactique (6-20 min) n est pas du tout ciblee. Ce WOD sollicite en realite la filiere aerobie longue. La duree cible de 20 min est une illusion — soit on reduit les rounds a 2-3, soit on reduit les distances et volumes.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'AMRAP 12 min\n3 Clean & Jerk @ 80% 1RM\n6 Bar Muscle-Ups\n9 GHD Sit-Ups',
+ intention:'Developpement de la capacite anaerobie lactique sur un triplet avance',
+ suspects:[
+   {id:'s1',text:'80% 1RM en C&J est trop lourd pour maintenir la qualite sur 12 min d AMRAP'},
+   {id:'s2',text:'Le GHD Sit-Up en volume AMRAP presente un risque de rhabdomyolyse'},
+   {id:'s3',text:'Bar Muscle-Up et Clean & Jerk partagent une demande sur les trapezes et la prise'},
+   {id:'s4',text:'12 min est en limite haute de la zone anaerobie lactique'},
+   {id:'s5',text:'Le triplet est trop complexe techniquement pour un format AMRAP'}
+ ],
+ real_errors:['s1','s2'],
+ explanations:{
+   s1:'A 80% 1RM, le C&J necessite une recuperation quasi-complete entre les sets. Sur un AMRAP 12 min, l athlete va inevitablement paser sous le seuil de qualite technique des le round 3-4. Le C&J en AMRAP se programme entre 50-65% 1RM maximum pour maintenir la mecanique sur la duree.',
+   s2:'Les GHD Sit-Ups en volume AMRAP (potentiellement 50-80 reps sur 12 min) representent un risque serieux de rhabdomyolyse pour tout athlete qui n y est pas specifiquement habitue. La regle : ne jamais programmer les GHD Sit-Ups en volume libre (AMRAP, For Time) sans avoir etabli une base de 15-20 reps maximum chez l athlete.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'Intervals : 6 rounds\n3 min ON / 1 min OFF\nChaque round : Max Calories Assault Bike\n+ 10 Handstand Push-Ups',
+ intention:'Developpement VO2max sur format intervalles longs',
+ suspects:[
+   {id:'s1',text:'Le ratio 3:1 (T:R) est trop eleve pour un objectif VO2max'},
+   {id:'s2',text:'Les HSPU perturbent l effort cardio-vasculaire pendant les 3 min d effort'},
+   {id:'s3',text:'6 rounds de 3 min = 18 min de travail effectif — hors zone VO2max'},
+   {id:'s4',text:'L Assault Bike et les HSPU creent une interference sur les epaules'},
+   {id:'s5',text:'1 min de repos est insuffisant pour maintenir l intensite sur 6 rounds'}
+ ],
+ real_errors:['s2','s4','s5'],
+ explanations:{
+   s2:'Le VO2max se developpe par des efforts continus a haute intensite cardiovasculaire. Interrompre l effort bike pour faire des HSPU fait baisser la FC sous la zone cible et fragmente le stimulus. Pour le VO2max, l effort doit etre continu ou quasi-continu — pas interrompu par des mouvements techniques.',
+   s4:'L Assault Bike sollicite activement les epaules (poussee/traction sur les bras). Les HSPU sont le mouvement le plus demandant pour les epaules. Combiner les deux dans le meme round = surcharge des deltoides et coiffe des rotateurs, limitant la puissance sur le bike et compromettant la forme des HSPU.',
+   s5:'Pour maintenir une intensite VO2max sur 6 rounds, le ratio T:R doit etre d au moins 1:1 voire 1:2. 1 min de repos apres 3 min d effort intense est nettement insuffisant — la FC ne redescend pas assez pour permettre un nouvel effort maximal. L intensite va chuter progressivement.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'Chipper For Time\n50 Double Unders\n40 Wall Balls (9kg)\n30 Pull-Ups\n20 Power Cleans @ 70kg\n10 Ring Muscle-Ups',
+ intention:'Seance de capacite globale avec progression de difficulte',
+ suspects:[
+   {id:'s1',text:'Les mouvements les plus techniques sont places en fin de chipper, sous fatigue maximale'},
+   {id:'s2',text:'Le Power Clean a 70kg apres 120 reps cumulees est un risque technique majeur'},
+   {id:'s3',text:'Le Wall Ball et le Pull-Up creent une interference moderee sur l epaule'},
+   {id:'s4',text:'Les Double Unders en ouverture de chipper sont un mauvais choix'},
+   {id:'s5',text:'Le volume total est trop eleve pour un chipper'}
+ ],
+ real_errors:['s1','s2'],
+ explanations:{
+   s1:'La regle fondamentale du chipper : les mouvements techniques et les plus exigeants SNC (Power Clean, Ring Muscle-Up) doivent etre places EN DEBUT de sequence, quand le systeme nerveux est frais. Les placer en fin avec 120 reps accumulees = technique degradee, risque de blessure majore, et incapacite a exprimer la vraie force.',
+   s2:'20 Power Cleans a 70kg apres 50 DU + 40 WB + 30 Pull-Ups (120 reps cumulees) = fatigue systemique majeure. La position de reception du clean (avant-bras, coudes) sera compromis. C est exactement le contexte ou les blessures lombaires et d epaules surviennent en CrossFit.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'Buy-In : 1000m Row\nAMRAP 15 min\n7 Deadlifts @ 100kg\n7 Burpee Box Jumps (60cm)\nCash-Out : 1000m Row',
+ intention:'Seance de force-endurance aerobie avec travail de capacite globale',
+ suspects:[
+   {id:'s1',text:'Le Buy-In de 1000m Row cree une pre-fatigue trop importante sur les ischios-jambiers'},
+   {id:'s2',text:'Le Deadlift a 100kg et le Buy-In Row partagent une demande sur la chaine posterieure'},
+   {id:'s3',text:'L AMRAP 15 min apres un 1000m Row intensif ne peut pas etre execute a pleine intensite'},
+   {id:'s4',text:'Le Cash-Out de 1000m Row apres le WOD principal est contreproductif'},
+   {id:'s5',text:'Le Burpee Box Jump et le Deadlift creent une interference sur les quadriceps'}
+ ],
+ real_errors:['s1','s2'],
+ explanations:{
+   s1:'Un 1000m Row a bon rythme prend 3.5-4.5 min et sollicite intensement la chaine posterieure (ischios, lombaires, trapeze). Un Buy-In doit rester entre 2-4 min et cibler des patterns peripheriques au WOD central. Ici, le Row pre-fatigue exactement les muscles les plus sollicites par le Deadlift.',
+   s2:'Row = chaine posterieure dominante (ischios, lombaires, grand dorsal). Deadlift = chaine posterieure dominante. Combiner les deux en Buy-In + WOD central sans recuperation = surcharge de la chaine posterieure, degradation technique du deadlift et risque lombaire eleve.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'E3MOM x 18 min (6 rounds)\n1 Snatch @ 90% 1RM\n3 Snatch @ 75% 1RM\n5 Snatch @ 60% 1RM',
+ intention:'Developpement de la puissance et de la technique du snatch via vague de charge',
+ suspects:[
+   {id:'s1',text:'Commencer par 90% 1RM sans echauffement specifique est risque'},
+   {id:'s2',text:'9 snatches par round represente un volume trop eleve pour l haltero olympique'},
+   {id:'s3',text:'La vague descendante (90-75-60%) est l inverse de la logique de potentialisation'},
+   {id:'s4',text:'E3MOM ne laisse pas assez de repos pour recuperer de 9 snatches'},
+   {id:'s5',text:'Le snatch a 60% apres 90% et 75% sera de mauvaise qualite technique'}
+ ],
+ real_errors:['s3','s4'],
+ explanations:{
+   s3:'La logique de la vague en haltero est ascendante (60-75-90%) pour utiliser la potentialisation post-activation : les charges moderees preparent le SNC a exprimer sa pleine puissance sur la charge maximale. Une vague descendante inverse ce principe — on commence au maximum quand le SNC n est pas encore pleinement active.',
+   s4:'9 snatches totaux par round avec une charge allant jusqu a 90% 1RM necessite une recuperation de 4-6 min minimum pour maintenir la qualite technique et la puissance. E3MOM (3 min) est nettement insuffisant. L E5MOM ou E6MOM serait adapte pour ce volume et ces intensites.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'For Time — Ladder montante\n2-4-6-8-10-12-14-16-18-20\nKettlebell Swings (32kg)\nBox Jumps (60cm)',
+ intention:'Travail de puissance explosive de la chaine posterieure, filiere anaerobie, duree cible 8 min',
+ suspects:[
+   {id:'s1',text:'Le volume total (110 reps par mouvement = 220 reps) est incompatible avec 8 min'},
+   {id:'s2',text:'Le KB Swing et le Box Jump partagent l extension explosive de hanche'},
+   {id:'s3',text:'La ladder montante augmente le volume alors que la fatigue augmente'},
+   {id:'s4',text:'32kg est trop lourd pour un KB Swing en volume eleve'},
+   {id:'s5',text:'Ce WOD durera 18-28 min pour la majorite des athletes intermediaires'}
+ ],
+ real_errors:['s1','s5'],
+ explanations:{
+   s1:'110 KB Swings a 32kg + 110 Box Jumps = 220 reps a intensite moderee-elevee. Pour un athlete intermediaire, c est 20-30 min de travail, pas 8 min. La duree cible de 8 min est completement incompatible avec ce volume. Pour 8 min de travail anaerobie, la ladder devrait s arreter a 2-4-6-8-10 (50 reps par mouvement).',
+   s5:'La realite physiologique de ce WOD pour un athlete intermediaire est 20-28 min, ce qui cible la filiere aerobie (VO2max), pas l anaerobie comme declare. L intention et la prescription sont completement desynchronisees.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'Intervals : 10 rounds\n20s Assault Bike maximal\n10s Repos\n(Protocole Tabata strict)',
+ intention:'Developpement anaerobie alactique — puissance maximale sur le bike',
+ suspects:[
+   {id:'s1',text:'Le protocole Tabata (ratio 2:1) ne developpe pas la filiere alactique'},
+   {id:'s2',text:'10 rounds au lieu de 8 rounds sort du protocole Tabata original'},
+   {id:'s3',text:'L Assault Bike est le meilleur choix pour ce protocole'},
+   {id:'s4',text:'La filiere alactique necessite un ratio T:R de 1:5 a 1:8, pas 2:1'},
+   {id:'s5',text:'20s d effort ne permet pas de solliciter la phosphocreatine de facon optimale'}
+ ],
+ real_errors:['s1','s4','s5'],
+ explanations:{
+   s1:'Le Tabata (20s/10s) a un ratio 2:1 qui cible le seuil lactique et la capacite aerobie, pas la filiere alactique. Tabata (1996) montrait un developpement simultane aerobie/anaerobie, mais jamais phosphocreatine pure.',
+   s4:'La phosphocreatine se resyntetise en 3-5 minutes de repos complet. Un ratio 2:1 ne permet pas cette resynthese. Pour solliciter la filiere alactique : efforts de 5-10s maximum avec 45-90s de repos complet.',
+   s5:'La phosphocreatine est epuisee en 8-12s d effort maximal. A 20s d effort, l athlete passe inevitablement en mode lactique apres les 10-12 premieres secondes. Ce n est plus de l alactique — c est de la capacite anaerobie lactique.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'AMRAP 18 min\n5 Pistol Squats (alternates)\n10 Ring Push-Ups\n15 Hollow Rocks',
+ intention:'Seance de force gymnastic au poids de corps, filiere aerobie',
+ suspects:[
+   {id:'s1',text:'Le Pistol Squat est trop technique pour etre programme en AMRAP sans supervision'},
+   {id:'s2',text:'Ring Push-Up et Hollow Rock ne creent pas d interference musculaire significative'},
+   {id:'s3',text:'18 min d AMRAP au poids de corps est bien calibre pour la filiere aerobie'},
+   {id:'s4',text:'Le Pistol Squat sollicite les flechisseurs de hanche — interference avec le Hollow Rock'},
+   {id:'s5',text:'Le volume de 15 Hollow Rocks par round va generer une fatigue de gainage qui compromet le Pistol Squat'}
+ ],
+ real_errors:['s4','s5'],
+ explanations:{
+   s4:'Le Pistol Squat necessite une flexion de hanche maximale (jambe libre maintenue horizontale) et une compression active des flechisseurs. Le Hollow Rock maintient une position de compression abdominale et flechisseurs. Alterner les deux dans un AMRAP long = fatigue progressive des flechisseurs de hanche qui va degrader la profondeur et l equilibre du Pistol apres les premiers rounds.',
+   s5:'15 Hollow Rocks par round sollicitent intensement le gainage anterieur et les flechisseurs. Le Pistol Squat necessite un gainage stable et des flechisseurs de hanche forts pour maintenir la jambe libre. Sur 18 min, la degradation du gainage va progressivement compromettre la qualite technique du Pistol, augmentant le risque de chute et de compensation.'
+ }
+},
+
+/* ================================================================
+   AVANCE (3 erreurs dont certaines cachees)
+================================================================ */
+{diff:'avance',
+ wod:'E2MOM x 24 min (12 rounds)\nMin 1 : 3 Clean & Jerk @ 78% 1RM\nMin 2 : 8 Bar Muscle-Ups\nRatio T:R effectif : ~45s/75s = 0.6:1\nVolume effectif : ~9 min',
+ intention:'Seance de seuil lactique sur filiere mixte haltero-gymnastics',
+ suspects:[
+   {id:'s1',text:'Le ratio T:R de 0.6:1 est en dessous du ratio optimal pour le seuil lactique'},
+   {id:'s2',text:'78% 1RM en C&J est trop proche du maximum pour 12 rounds'},
+   {id:'s3',text:'Le volume effectif de 9 min est insuffisant pour une adaptation seuil robuste'},
+   {id:'s4',text:'Le Bar Muscle-Up et le Clean & Jerk partagent une demande sur les trapezes'},
+   {id:'s5',text:'E2MOM est le bon format pour ce type de couplet'}
+ ],
+ real_errors:['s1','s2','s3'],
+ explanations:{
+   s1:'Le seuil lactique necessite un ratio T:R entre 1:1 et 1:1.5. Un ratio de 0.6:1 signifie plus de repos que de travail — on se rapproche de la zone anaerobie avec recuperation partielle, pas du seuil. Pour corriger : augmenter le volume de travail (5 C&J + 10 BMU) ou reduire l intervalle a E1MOM.',
+   s2:'Sur 12 rounds cumulatifs, 78% 1RM en C&J va generer une fatigue SNC progressive. Des le round 7-8, la degradation technique sera significative. Pour un EMOM de 12+ rounds, la zone 68-75% 1RM permet de maintenir la qualite et l intention de seuil lactique.',
+   s3:'9 min de travail effectif est en bas de fourchette pour le seuil lactique (6-20 min). Pour une adaptation robuste, vise 12-16 min de travail effectif. Solution : 28-32 min d EMOM au lieu de 24.'
+ }
+},
+
+{diff:'avance',
+ wod:'For Time\n50 Wall Balls (9kg)\n40 Toes-to-Bar\n30 Power Snatches @ 50kg\n20 Ring Muscle-Ups\n10 Squat Cleans @ 90kg',
+ intention:'Chipper de capacite globale pour athletes confirmes, duree cible 15-20 min',
+ suspects:[
+   {id:'s1',text:'L ordre des mouvements viole le principe de placement technique'},
+   {id:'s2',text:'Le Squat Clean a 90kg en fin de chipper est un risque majeur'},
+   {id:'s3',text:'Wall Ball et T2B creent une interference sur les flechisseurs de hanche'},
+   {id:'s4',text:'20 Ring Muscle-Ups apres 120 reps cumulees ne peut pas etre execute correctement'},
+   {id:'s5',text:'La duree reelle sera 25-40 min pour un athlete confirme — hors zone cible'}
+ ],
+ real_errors:['s1','s2','s4'],
+ explanations:{
+   s1:'Ce chipper place les mouvements techniques et neuralement demandants (Ring MU, Squat Clean lourd) APRES les mouvements a volume eleve. La regle : technique lourde en premier (Squat Clean, Power Snatch), puis gymnastics complexe (Ring MU), puis volume metabolique (T2B, Wall Ball). L ordre correct serait : 10 Squat Cleans > 20 RMU > 30 Power Snatches > 40 T2B > 50 Wall Balls.',
+   s2:'10 Squat Cleans a 90kg apres 110 reps cumulees (WB + T2B + Snatch + RMU) = fatigue systemique maximale sur un mouvement qui necessite une reception en squat avec 90kg sur les epaules. C est le contexte ideal pour une blessure au genou, lombaire ou d epaule.',
+   s4:'20 Ring Muscle-Ups est deja un volume consequent a froid. Apres 90 reps cumulees (Wall Ball + T2B + Snatch), les stabilisateurs d epaule et le grand dorsal sont epuises. La transition du Ring MU (la phase la plus technique) sera compromise — risque de chute et de blessure d epaule.'
+ }
+},
+
+{diff:'avance',
+ wod:'Intervalles : 8 x (4 min ON / 2 min OFF)\nChaque round : 400m Run + Max Thrusters @ 43kg\nRatio T:R : 2:1\nVolume effectif : 32 min',
+ intention:'Developpement du VO2max sur format long intervalle',
+ suspects:[
+   {id:'s1',text:'Le ratio 2:1 avec 4 min d effort est correct pour le VO2max'},
+   {id:'s2',text:'Le volume effectif de 32 min depasse largement la zone VO2max optimale'},
+   {id:'s3',text:'Combiner run et Thrusters dans le meme intervalle fragmente le stimulus cardiovasculaire'},
+   {id:'s4',text:'2 min de repos est insuffisant pour maintenir l intensite VO2max sur 8 rounds'},
+   {id:'s5',text:'Les Thrusters apres le Run creent une interference sur les quadriceps'}
+ ],
+ real_errors:['s2','s3','s4'],
+ explanations:{
+   s2:'32 min de travail effectif est massivement au-dessus de la zone VO2max (10-25 min max). Au-dela, l adaptation cible devient l endurance fondamentale aerobie. Pour le VO2max, 4-6 intervalles de 3-5 min sont optimaux, pas 8 intervalles.',
+   s3:'Le VO2max se developpe par des efforts cardiovasculaires intenses et continus. Interrompre le run pour les Thrusters fait chuter la FC, fragmentant le stimulus. Pour le VO2max, utilise des mouvements mono-structuraux purs (run, bike, row, ski erg) ou des mouvements a tres faible cout technique.',
+   s4:'Pour maintenir une intensite VO2max sur 8 rounds, le repos doit etre au moins egal au temps d effort (ratio 1:1) voire superieur. Avec 4 min d effort et 2 min de repos, l intensite va chuter progressivement a partir du round 4, transformant les derniers rounds en effort sous-maximal.'
+ }
+},
+
+{diff:'avance',
+ wod:'AMRAP 20 min — Triplet\n5 Squat Snatches @ 65% 1RM\n10 Chest-to-Bar Pull-Ups\n15 Box Jumps (60cm) step-down',
+ intention:'Conditioning aerobie sur triplet technique, filiere VO2max',
+ suspects:[
+   {id:'s1',text:'Le Squat Snatch a 65% en AMRAP 20 min est une erreur de choix de mouvement'},
+   {id:'s2',text:'C2B et Squat Snatch partagent une demande sur les trapezes et la prise — interference subtile'},
+   {id:'s3',text:'Le step-down sur Box Jump reduit l interet pliometrique mais est justifie sur 20 min'},
+   {id:'s4',text:'Le volume effectif de 20 min est correct pour la filiere aerobie'},
+   {id:'s5',text:'65% 1RM en Squat Snatch sous fatigue de 20 min va generer une degradation technique progressive'}
+ ],
+ real_errors:['s1','s2','s5'],
+ explanations:{
+   s1:'Le Squat Snatch est le mouvement technique le plus complexe du CrossFit. Sur 20 min d AMRAP, la fatigue SNC et neuromusculaire va degrader la mecanique de reception apres les premiers rounds. Le Power Snatch ou le Hang Power Snatch sont des alternatives valides. Le Squat Snatch en AMRAP long n est adapte qu aux athletes d elite avec une technique automatis ee.',
+   s2:'Le Squat Snatch mobilise intensement les trapezes (shrug) et la prise (maintien de la barre en overhead). Le C2B recrute massivement le grand dorsal et les biceps, avec une forte demande sur les trapezes en debut de traction. Sur 20 min, cette interference va progressivement limiter la puissance du shrug dans le snatch et la force de maintien overhead.',
+   s5:'A 65% 1RM, les premiers rounds seront de bonne qualite. Mais apres 8-10 min, la fatigue systemique va compromettre la position de reception (squat complet sous la barre), le timing du retournement et la stabilite overhead. La probabilite de no-rep ou de blessure augmente significativement apres le round 5-6.'
+ }
+},
+
+{diff:'avance',
+ wod:'E1MOM x 30 min\nMin 1 : 12 Calories Assault Bike\nMin 2 : 8 Handstand Push-Ups\nMin 3 : 6 Power Cleans @ 75% 1RM\n(Cycle de 3 min, 10 cycles)',
+ intention:'Seance de seuil lactique sur triplet mixte cardio-gymnastics-haltero',
+ suspects:[
+   {id:'s1',text:'30 min d EMOM depasse la zone optimale du seuil lactique'},
+   {id:'s2',text:'Le ratio T:R effectif est trop variable entre les 3 stations'},
+   {id:'s3',text:'L Assault Bike et le HSPU creent une interference majeure sur les epaules'},
+   {id:'s4',text:'75% 1RM en Power Clean sur 10 rounds cumulatifs est trop lourd pour maintenir la qualite'},
+   {id:'s5',text:'Le cycle de 3 min cree de facto un E3MOM, pas un E1MOM'}
+ ],
+ real_errors:['s1','s3','s4'],
+ explanations:{
+   s1:'30 min de travail quasi-continu avec ~40-45s de travail par minute = environ 20-22 min de travail effectif. C est au-dessus de la zone seuil lactique optimale (6-20 min). Ce WOD derive vers un travail de capacite aerobie longue. Pour le seuil lactique, limiter a 18-20 min total.',
+   s3:'L Assault Bike sollicite activement les epaules (poussee-traction sur les bras). Les HSPU sont le mouvement le plus stressant pour les deltoides, coiffe des rotateurs et tricep. Les enchainer toutes les 3 min pendant 30 min = surcharge chronique des epaules. Ce triplet doit remplacer le bike par du rowing (moins de sollicitation epaule) ou substituer les HSPU par des T2B.',
+   s4:'6 Power Cleans a 75% 1RM, 10 fois sur 30 min = 60 reps a intensite elevee. La fatigue SNC et musculaire va degrader la technique de reception apres le round 5-6. Pour un EMOM de 10+ rounds, la zone 65-70% 1RM maintient la qualite technique et l intention de seuil lactique.'
+ }
+},
+
+{diff:'avance',
+ wod:'Buy-In : 500m Row\nFor Time :\n40 Deadlifts @ 100kg\n30 Box Jumps (60cm)\n20 Bar Muscle-Ups\n10 Squat Cleans @ 100kg\nCash-Out : 500m Row',
+ intention:'Seance de force-endurance sur format chipper encadre, duree totale cible 20 min',
+ suspects:[
+   {id:'s1',text:'Le Cash-Out Row apres le WOD principal est contre-productif sur le plan de la recuperation'},
+   {id:'s2',text:'Le Deadlift et le Squat Clean a meme charge (100kg) creent une confusion dans la calibration'},
+   {id:'s3',text:'L ordre des mouvements dans le chipper est incorrect — technique en fin'},
+   {id:'s4',text:'40 Deadlifts a 100kg en ouverture pre-fatigue la chaine posterieure pour le Squat Clean'},
+   {id:'s5',text:'Le Buy-In Row pre-fatigue la chaine posterieure avant 40 Deadlifts lourds'}
+ ],
+ real_errors:['s3','s4','s5'],
+ explanations:{
+   s3:'Le chipper place le Bar Muscle-Up (complexe, SNC-demandant) en 3e position apres 70 reps cumulees, et le Squat Clean (technique maximale) en derniere position. Les deux mouvements les plus techniques sont places sous fatigue systemique maximale. L ordre correct : Squat Cleans > Bar Muscle-Ups > Box Jumps > Deadlifts.',
+   s4:'40 Deadlifts a 100kg sollicitent massivement la chaine posterieure (lombaires, ischios, fessiers). Le Squat Clean a 100kg necessite une chaine posterieure fraiche pour une reception en squat propre et une extension explosive. Pre-fatiguer exactement ces muscles avec 40 DL compromet la mecanique et la securite du Squat Clean.',
+   s5:'500m Row a bon rythme sollicite intensement lombaires, ischios et grand dorsal. Enchainer avec 40 Deadlifts a 100kg = surcharge acute de la chaine posterieure. Le Buy-In doit cibler des patterns peripheriques au WOD, pas les memes chaines musculaires. Remplacer par 500m Run ou 30 cal Bike.'
+ }
+},
+
+{diff:'avance',
+ wod:'Ladder descendante For Time\n10-8-6-4-2\nSquat Snatches @ 80% 1RM\nRing Muscle-Ups',
+ intention:'Benchmark de force-puissance sur filiere anaerobie lactique, duree cible 6-10 min',
+ suspects:[
+   {id:'s1',text:'80% 1RM en Squat Snatch est inadapte a une ladder descendante For Time'},
+   {id:'s2',text:'Le Ring Muscle-Up et le Squat Snatch creent une interference sur les epaules et trapezes'},
+   {id:'s3',text:'La structure 10-8-6-4-2 est inadaptee pour des mouvements aussi lourds et techniques'},
+   {id:'s4',text:'La duree reelle sera probablement 15-25 min, pas 6-10 min'},
+   {id:'s5',text:'Le Ring Muscle-Up est inadapte en volume For Time'}
+ ],
+ real_errors:['s1','s3','s4'],
+ explanations:{
+   s1:'A 80% 1RM, le Squat Snatch est un exercice de force maximale qui necessite 2-3 min de recuperation entre les sets. En format For Time avec pression temporelle, l athlete va inevitablement sacrifier la mecanique de reception pour aller vite. Le risque de blessure d epaule (reception ratee en overhead) est majeur. Pour une ladder For Time : 60-70% maximum.',
+   s3:'10 reps de Squat Snatch a 80% en premier set = effort quasi-maximal pour la plupart des athletes avances. La structure descendante suppose qu on peut repartir sur le set suivant avec recuperation incomplete. Avec ce niveau de charge, l athlete devra faire de longues pauses entre chaque rep, transformant le WOD en une seance de force deguisee.',
+   s4:'10+8+6+4+2 = 30 Squat Snatches a 80% + 30 Ring Muscle-Ups. Meme pour un athlete de niveau regional, ce WOD prendra 20-30 min minimum. La duree cible de 6-10 min est completement incompatible avec le volume et l intensite prescrits.'
+ }
+},
+
+{diff:'avance',
+ wod:'Tabata complexe :\nStation A (4 rounds) : 20s Squat Cleans @ 70% / 10s repos\nStation B (4 rounds) : 20s Bar Muscle-Ups / 10s repos\nSans repos entre stations A et B',
+ intention:'Developpement de la capacite anaerobie lactique sur mouvement haltero + gymnastics',
+ suspects:[
+   {id:'s1',text:'Le Squat Clean a 70% 1RM est trop lourd pour le format Tabata'},
+   {id:'s2',text:'Le passage sans repos de la station A a la station B est une erreur de programmation'},
+   {id:'s3',text:'Le Tabata sur mouvements techniques degrade inevitablement la mecanique'},
+   {id:'s4',text:'Le Bar Muscle-Up apres Squat Clean pre-fatigue les trapezes et la prise'},
+   {id:'s5',text:'4 rounds seulement par station est insuffisant pour le protocole Tabata'}
+ ],
+ real_errors:['s1','s2','s3'],
+ explanations:{
+   s1:'Le Squat Clean a 70% 1RM necessite une reception en squat parfaite et une extension explosive. A la cadence Tabata (20s ON), l athlete va executer 4-6 reps par round. Sous la fatigue des rounds 3-4, le coude lent, la reception haute et le manque de profondeur vont se manifester. Ce niveau de charge sur ce format = blessures d epaule et de genou.',
+   s2:'Sans repos entre les deux stations, la fatigue du Squat Clean (trapezes, avant-bras, prise, fessiers) est directement transferee sur le Bar Muscle-Up. La qualite de traction et de transition va s effondrer des le premier round de la station B. Un minimum de 3-4 min de repos est necessaire entre les deux stations.',
+   s3:'Le Tabata est concu pour des mouvements a faible complexite technique (bike, row, air squat, push-up) permettant de maintenir la mecanique sous fatigue extreme. Le Squat Clean et le Bar Muscle-Up sont les deux mouvements les plus techniques du CrossFit. Les programmer en Tabata revient a entrainer l athlete a mal executer des mouvements techniques sous fatigue maximale.'
+ }
+},
+
+{diff:'avance',
+ wod:'E2MOM x 28 min (14 rounds)\nMin impaires : 5 Front Squats @ 82% 1RM + 5 HSPU\nMin paires : 15 Cal Row + 5 T2B\nRatio T:R effectif : ~50s/70s = 0.71:1',
+ intention:'Developpement du seuil lactique sur format mixte force-cardio',
+ suspects:[
+   {id:'s1',text:'Le ratio T:R de 0.71:1 est trop bas pour le seuil lactique (cible 1:1)'},
+   {id:'s2',text:'5 Front Squats a 82% + 5 HSPU dans la meme minute est physiologiquement irrealisable'},
+   {id:'s3',text:'28 min total depasse la zone optimale du seuil lactique'},
+   {id:'s4',text:'Le volume effectif est correctement calcule pour cette intention'},
+   {id:'s5',text:'L interference entre Front Squat et HSPU est negligeable'}
+ ],
+ real_errors:['s1','s2','s3'],
+ explanations:{
+   s1:'Le seuil lactique necessite un ratio T:R entre 1:1 et 1.5:1. Un ratio de 0.71:1 signifie que l athlete recupere plus qu il ne travaille, ce qui cible plutot la capacite anaerobie avec recuperation partielle. Pour le seuil, augmenter le volume de travail ou reduire les intervalles de repos.',
+   s2:'5 Front Squats a 82% 1RM prend environ 30-35s pour un athlete avance. Il reste 25-30s pour 5 HSPU. Des le round 3-4, la fatigue accumulee des jambes (Front Squat) et des epaules (HSPU) rendra ce double effort quasi-impossible dans la fenetre de 60s. Ce WOD va inevitablement generer des rests forces et une degradation technique majeure.',
+   s3:'28 min d effort quasi-continu (meme avec des pauses courtes) depasse la zone seuil lactique. La duree optimale pour cette filiere est 15-22 min de travail total. Reduire a 20 min (10 rounds) ou diminuer la frequence des rounds.'
+ }
+},
+
+{diff:'avance',
+ wod:'For Time — Couplet\n21-15-9\nSquat Cleans @ 90kg\nRing Muscle-Ups\nTemps cible elite : sub 6 min',
+ intention:'Benchmark de force-puissance sur filiere anaerobie lactique type Fran lourd',
+ suspects:[
+   {id:'s1',text:'90kg en Squat Clean est trop lourd pour maintenir la mecanique sur 21 reps en ouverture'},
+   {id:'s2',text:'Ring Muscle-Up et Squat Clean creent une interference sur les trapezes et grand dorsal'},
+   {id:'s3',text:'La structure 21-15-9 est inadaptee pour des mouvements aussi demandants'},
+   {id:'s4',text:'Le temps cible sub 6 min est irrealiste pour ce volume et cette intensite meme au niveau elite'},
+   {id:'s5',text:'Ce WOD est bien concu — aucune erreur significative pour des athletes de haut niveau'}
+ ],
+ real_errors:['s1','s3','s4'],
+ explanations:{
+   s1:'21 Squat Cleans a 90kg en premier set implique une fragmentation severe (sets de 3-5 reps maximum) avec de longues pauses pour la majorite des athletes avances. La reception en squat va progressivement se degrader (reception de plus en plus haute, coudes qui tombent). Le benchmark Diane (Deadlift + HSPU) utilise 102.5kg de Deadlift precisement parce que ce mouvement tolere mieux la fatigue. Le Squat Clean est plus technique et moins tolerant.',
+   s3:'21-15-9 fonctionne parfaitement pour les couplets ou la fatigue locale reste moderee sur chaque set (Fran : Thruster + Pull-Up). Avec Squat Clean @ 90kg + Ring MU, le premier set de 21 est deja un effort quasi-maximal pour un athlete avance. La structure descendante n allegera pas suffisamment la charge pour permettre un rythme soutenu.',
+   s4:'21 Squat Cleans a 90kg seuls prennent 4-8 min pour un athlete avance (fragmentation obligatoire). Ajouter 21 Ring Muscle-Ups + les sets de 15 et 9 = 20-35 min de WOD realiste. Sub 6 min n est possible qu avec une charge de 60-70kg et un Ring Muscle-Up solide. Le temps cible sous-estime massivement la duree reelle.'
+ }
+}
+
+]; /* fin DIAG_BANK */
+
+/* ================================================================
+   DEBUTANT supplementaires (11-17)
+================================================================ */
+,{diff:'debutant',
+ wod:'For Time\n3 rounds :\n500m Row\n21 KB Swings (24kg)\n12 Pull-Ups',
+ intention:'Seance de puissance anaerobie lactique, duree cible 8 min',
+ suspects:[
+   {id:'s1',text:'Helen est un benchmark etabli — aucune erreur de conception'},
+   {id:'s2',text:'La duree reelle de ce WOD est 12-22 min, pas 8 min'},
+   {id:'s3',text:'Le Row et le KB Swing creent une interference sur la chaine posterieure'},
+   {id:'s4',text:'Ce WOD cible en realite la filiere aerobie, pas l anaerobie lactique'},
+   {id:'s5',text:'3 rounds n est pas suffisant pour un WOD de capacite'}
+ ],
+ real_errors:['s2','s4'],
+ explanations:{
+   s2:'Helen (benchmark officiel CrossFit) dure entre 9 et 18 min selon le niveau. La duree cible de 8 min est impossible pour 99% des athletes. Ce n est pas une erreur de conception d Helen, mais une mauvaise intention declaree.',
+   s4:'12-18 min de travail continu cible la filiere aerobie (VO2max) et le seuil lactique, pas la puissance anaerobie lactique (2-8 min). L intention declaree est incorrecte.'
+ }
+},
+
+{diff:'debutant',
+ wod:'Intervals : 10 x (30s ON / 30s OFF)\nMouvement : Deadlift @ 100% 1RM',
+ intention:'Developpement de la force maximale via protocole intervalle',
+ suspects:[
+   {id:'s1',text:'100% 1RM = effort maximal unique — impossible a repeter 10 fois'},
+   {id:'s2',text:'Le format intervalle est inadapte pour le developpement de la force maximale'},
+   {id:'s3',text:'30s de repos est insuffisant entre des efforts maximaux'},
+   {id:'s4',text:'Le Deadlift est le bon choix pour ce protocole'},
+   {id:'s5',text:'10 rounds est un volume excessif pour ce niveau de charge'}
+ ],
+ real_errors:['s1','s2','s3'],
+ explanations:{
+   s1:'Le 1RM par definition est une repetition maximale — impossible a reproduire 10 fois dans la meme seance. Meme une seule tentative a 100% 1RM necessite une preparation specifique.',
+   s2:'La force maximale se developpe via des protocoles de force (5x5, 3x3, rampe vers un max) avec des temps de repos de 3-5 min. Les intervalles court sont des outils metaboliques, pas des outils de force.',
+   s3:'La phosphocreatine necessite 3-5 min pour se resyntetiser completement apres un effort maximal. 30s de repos ne permet aucune recuperation significative pour un effort a 100% 1RM.'
+ }
+},
+
+{diff:'debutant',
+ wod:'AMRAP 8 min\n10 Thrusters @ 60kg\n10 Thrusters @ 60kg\n10 Thrusters @ 60kg',
+ intention:'Travail de force-endurance sur squat-push vertical',
+ suspects:[
+   {id:'s1',text:'Ce WOD est simplement 30 Thrusters a 60kg en boucle — formulation inutilement complexe'},
+   {id:'s2',text:'60kg est trop lourd pour un AMRAP de Thrusters'},
+   {id:'s3',text:'Le Thruster seul ne constitue pas un WOD equilibre'},
+   {id:'s4',text:'L AMRAP 8 min est bien calibre pour la force-endurance'},
+   {id:'s5',text:'Repeter le meme mouvement trois fois dans un circuit n a pas de sens'}
+ ],
+ real_errors:['s1','s3'],
+ explanations:{
+   s1:'Ecrire 10+10+10 Thrusters revient exactement a ecrire 30 Thrusters. La repetition n ajoute aucune valeur pedagogique ni physiologique. C est une formulation inutilement complexe qui peut introduire de la confusion dans la lecture du WOD.',
+   s3:'Un WOD mono-mouvement comme 30 Thrusters en AMRAP est un test de force-endurance specifique, pas un WOD de conditioning complet. Il n y a aucun pattern complementaire (traction, gainage, cardio pur). Pour un WOD equilibre, associe le Thruster a au moins un mouvement antagoniste.'
+ }
+},
+
+{diff:'debutant',
+ wod:'E1MOM x 10 min\nTous les rounds : 1 rep Power Snatch @ 95% 1RM',
+ intention:'Peaking de la force maximale sur le snatch via EMOM lourd',
+ suspects:[
+   {id:'s1',text:'60s entre les essais est insuffisant pour le travail de force maximale'},
+   {id:'s2',text:'10 tentatives a 95% 1RM dans une seance unique est un volume excessif'},
+   {id:'s3',text:'Le Power Snatch est le bon choix pour le peaking'},
+   {id:'s4',text:'L EMOM est un format inadapte pour la force maximale'},
+   {id:'s5',text:'95% 1RM est trop proche du maximum pour 10 rounds'}
+ ],
+ real_errors:['s1','s2','s4'],
+ explanations:{
+   s1:'Pour la force maximale, le temps de repos optimal entre les tentatives est de 3-5 min minimum. 60s ne permet pas la resynthese de phosphocreatine ni la recuperation SNC necessaire pour un effort a 95%.',
+   s2:'En competition ou en test de peaking, on realise 1-3 tentatives maximales. 10 tentatives a 95% en une seance va epuiser les reserves SNC et augmenter massivement le risque de blessure.',
+   s4:'L EMOM est un outil de conditioning et de technique sous legere fatigue. Pour le peaking de force, utilise un protocole de rampe (climbing singles) avec repos complets : 80%x1, 85%x1, 90%x1, 93%x1, 95%x1.'
+ }
+},
+
+{diff:'debutant',
+ wod:'For Time\n50-40-30-20-10\nAir Squats\nSit-Ups\n(Ladder descendante)',
+ intention:'Travail de force-endurance basse chaine et core, filiere seuil lactique',
+ suspects:[
+   {id:'s1',text:'Le volume total (150 air squats + 150 sit-ups) derive vers l aerobie long'},
+   {id:'s2',text:'Air Squat et Sit-Up ne creent aucune interference musculaire'},
+   {id:'s3',text:'La duree reelle sera 8-15 min — compatible avec le seuil lactique'},
+   {id:'s4',text:'Ce WOD manque de composante de poussee ou traction pour etre equilibre'},
+   {id:'s5',text:'150 sit-ups en une seance peut generer une fatigue lombaire excessive'}
+ ],
+ real_errors:['s1','s4'],
+ explanations:{
+   s1:'150 air squats + 150 sit-ups pour un athlete intermediaire = 12-20 min de travail. C est la zone aerobie (VO2max), pas le seuil lactique. Pour le seuil, reduire le volume total (21-15-9 ou 30-20-10 maximum).',
+   s4:'Ce WOD ne sollicite que squat (quad) et flexion de tronc (core). Il n y a aucun pattern de traction ou poussee. Un WOD equilibre doit inclure au moins 2-3 patterns complementaires. L absence de composante de buste superieur cree un desequilibre de sollicitation.'
+ }
+},
+
+{diff:'debutant',
+ wod:'Chipper For Time\n100 Pull-Ups\n100 Push-Ups\n100 Air Squats\n100 Sit-Ups\n1.5km Run',
+ intention:'Test de capacite globale au poids de corps, duree cible 30 min',
+ suspects:[
+   {id:'s1',text:'Pull-Ups et Push-Ups creent une interference elevee sur le buste superieur'},
+   {id:'s2',text:'Ce WOD est le benchmark Angie — bien concu pour son objectif'},
+   {id:'s3',text:'La duree cible de 30 min est realiste pour un athlete avance seulement'},
+   {id:'s4',text:'La run en fin de chipper apres 400 reps cumulees sera de tres mauvaise qualite'},
+   {id:'s5',text:'100 Pull-Ups en premier sous-utilisent la force fraiche du buste superieur'}
+ ],
+ real_errors:['s1','s4'],
+ explanations:{
+   s1:'Angie (benchmark officiel) place 100 Pull-Ups avant 100 Push-Ups. Les deux mouvements sollicitent intensement le buste superieur : Pull-Ups epuisent grand dorsal et bicep, Push-Ups epuisent pec et tricep. Bien que les groupes musculaires principaux soient differents, la fatigue systemique du buste superieur est massive. La transition est dure.',
+   s4:'Courir 1.5km apres 400 reps au poids de corps = effort de très mauvaise qualite. Les jambes (squats) et le buste (pull-ups, push-ups) sont epuises. La run devient une marche/jogging de recuperation plutot qu un effort de finishing. Si l objectif est de finir sur un effort cardiovasculaire, reduire la run a 400-800m.'
+ }
+},
+
+{diff:'debutant',
+ wod:'Tabata Row (calories)\n8 rounds : 20s effort max / 10s repos\nObjectif : score = total calories',
+ intention:'Developpement anaerobie lactique via Tabata Row',
+ suspects:[
+   {id:'s1',text:'Scorer en calories totales plutot qu en round le plus bas fausse le protocole Tabata'},
+   {id:'s2',text:'Le Row est inadapte au format Tabata'},
+   {id:'s3',text:'L objectif anaerobie lactique est correct pour ce format'},
+   {id:'s4',text:'8 rounds est le nombre correct pour le protocole Tabata'},
+   {id:'s5',text:'Le Row sollicite trop de groupes musculaires pour le Tabata'}
+ ],
+ real_errors:['s1'],
+ explanations:{
+   s1:'Le score Tabata officiel est le score du ROUND LE PLUS BAS (methode Tabata score). Cette methode force l athlete a maintenir une intensite constante — si tu sprintes sur les premiers rounds et effondres sur les derniers, ton score reste bas. Scorer en total calories encourage la strategie inverse : tout donner au debut et baisser en fin, ce qui sort du principe pedagogique du Tabata.'
+ }
+},
+
+/* ================================================================
+   INTERMEDIAIRE supplementaires (12-17)
+================================================================ */
+{diff:'intermediaire',
+ wod:'E1MOM x 20 min\nMin impaires : 5 Squat Cleans @ 75% + 5 Burpees\nMin paires : 400m Run',
+ intention:'Seance cardio-haltero sur filiere aerobie mixte',
+ suspects:[
+   {id:'s1',text:'400m Run en 60s est impossible pour la majorite des athletes'},
+   {id:'s2',text:'5 Squat Cleans + 5 Burpees en 60s est irrealisable des le round 3'},
+   {id:'s3',text:'Le Burpee et le Squat Clean creent une interference sur les quadriceps'},
+   {id:'s4',text:'Ce WOD ne laisse aucune recuperation, ce qui le transforme en effort continu'},
+   {id:'s5',text:'Le format EMOM est inadapte pour inclure un 400m Run'}
+ ],
+ real_errors:['s1','s2'],
+ explanations:{
+   s1:'Un 400m Run prend en moyenne 75-120s pour un athlete CrossFit. Le programmer dans une fenetre de 60s (E1MOM) est physiologiquement impossible. Ce mouvement necessite un E3MOM minimum pour etre integre dans un EMOM.',
+   s2:'5 Squat Cleans a 75% + 5 Burpees full = environ 60-80s de travail total. Dans une fenetre de 60s, il ne reste aucun temps de repos. Des le round 2-3, l athlete sera en retard sur l horloge et le WOD devient un effort continu non structure.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'For Time\n5 rounds :\n5 Squat Snatches @ 80% 1RM\n10 Ring Muscle-Ups\n15 GHD Sit-Ups',
+ intention:'Seance de force-technique avancee, duree cible 20 min',
+ suspects:[
+   {id:'s1',text:'80% 1RM en Squat Snatch n est pas maintenable sur 5 rounds For Time'},
+   {id:'s2',text:'GHD Sit-Ups en volume (75 reps totales) presente un risque de rhabdomyolyse'},
+   {id:'s3',text:'Ring Muscle-Up et Squat Snatch partagent des stabilisateurs d epaule'},
+   {id:'s4',text:'La duree reelle sera 35-55 min, pas 20 min'},
+   {id:'s5',text:'5 rounds de ces mouvements est un volume excessif'}
+ ],
+ real_errors:['s1','s2','s4'],
+ explanations:{
+   s1:'5 rounds de 5 Squat Snatches a 80% 1RM = 25 reps a intensite quasi-maximale sous pression temporelle. La technique de reception va s effondrer rapidement. Ce niveau de charge sur ce volume en For Time est une prescription dangereuse.',
+   s2:'75 GHD Sit-Ups en une seance pour tout athlete qui n y est pas specifiquement habitue presente un risque eleve de rhabdomyolyse (destruction musculaire). La regle : introduire progressivement les GHD (10 reps max lors des premieres seances) et ne jamais les programmer en volume libre.',
+   s4:'5 rounds de ces 3 mouvements techniques et lourds = 45-60 min de WOD realiste pour un athlete avance. La duree cible de 20 min est une illusion complete qui ne tient pas compte des pauses inevitables sur les mouvements lourds.'
+ }
+},
+
+{diff:'intermediaire',
+ wod:'Intervals : 5 x (2 min ON / 3 min OFF)\nChaque round : 10 Power Cleans @ 70% + Max Pull-Ups remaining time',
+ intention:'Developpement anaerobie lactique sur couplet haltero-gymnastics',
+ suspects:[
+   {id:'s1',text:'Le ratio T:R de 1:1.5 est acceptable mais legerement trop favorable pour l anaerobie'},
+   {id:'s2',text:'Power Clean et Pull-Up partagent une demande sur le grand dorsal et les bicep'},
+   {id:'s3',text:'Le format Max Pull-Ups en fin de fenetre cree une inegalite de stimulus entre rounds'},
+   {id:'s4',text:'70% 1RM en Power Clean est bien calibre pour ce type d intervalle'},
+   {id:'s5',text:'5 rounds est insuffisant pour developper l anaerobie lactique'}
+ ],
+ real_errors:['s2','s3'],
+ explanations:{
+   s2:'Le Power Clean mobilise intensement le grand dorsal (maintien de la barre proche du corps) et les bicep (traction initiale). Le Pull-Up recrute le grand dorsal comme moteur principal et les bicep comme synergiste. Enchainer les deux dans le meme round genere une fatigue locale majeure sur ces groupes — le nombre de pull-ups va chuter drastiquement a chaque round.',
+   s3:'Le format Max Pull-Ups depend du temps restant apres les Power Cleans. Si un athlete est rapide sur les cleans, il a 60s de pull-ups. S il est lent, il en a 20s. Le stimulus devient incomparable entre athletes et entre rounds. Pour uniformiser : prescrire un nombre fixe de pull-ups plutot qu un max.'
+ }
+}
+
+,{diff:'avance',
+ wod:'E3MOM x 30 min (10 rounds)\n2 Squat Snatches @ 88% 1RM\n4 Ring Muscle-Ups\n6 Box Jumps (75cm)',
+ intention:'Force-puissance sur filiere phosphocreatine, ratio T:R 1:5 vise',
+ suspects:[
+   {id:'s1',text:'E3MOM : effort de ~35s, repos ~145s = ratio proche 1:4 — acceptable pour alactique'},
+   {id:'s2',text:'30 min total avec 10 rounds depasse la zone phosphocreatine'},
+   {id:'s3',text:'88% 1RM sur 2 reps de Squat Snatch est adapte a ce format'},
+   {id:'s4',text:'Ring Muscle-Up apres Squat Snatch cree une interference sur les stabilisateurs epaule'},
+   {id:'s5',text:'Box Jump 75cm sous fatigue augmente le risque de blessure genou'}
+ ],
+ real_errors:['s2','s4'],
+ explanations:{
+   s2:'La phosphocreatine cible 0.5 a 4 min de travail effectif total. 10 rounds x 35s = 6 min de travail effectif, ce qui depasse la zone alactique. Pour rester en phosphocreatine, limiter a 4-5 rounds maximum.',
+   s4:'Le Squat Snatch a 88% necessite une stabilisation overhead intense. Le Ring Muscle-Up sollicite les memes stabilisateurs dans la transition. Enchainer les deux sans recuperation specifique de epaule cree une surcharge des stabilisateurs.'
+ }
+}
+,{diff:'debutant',
+ wod:'Tabata — 4 stations consecutives sans repos entre stations\nStation 1 : Pull-Ups\nStation 2 : Push-Ups\nStation 3 : Sit-Ups\nStation 4 : Air Squats',
+ intention:'Test de fitness general, filiere aerobie',
+ suspects:[
+   {id:'s1',text:'Pull-Ups et Push-Ups places consecutivement creent une interference sur le buste superieur'},
+   {id:'s2',text:'32 min total est trop long pour la filiere aerobie'},
+   {id:'s3',text:'Aucun repos entre stations est une erreur de structure'},
+   {id:'s4',text:'Le score Tabata doit etre le round le plus bas de chaque station'},
+   {id:'s5',text:'L air squat en derniere station est le meilleur placement'}
+ ],
+ real_errors:['s1','s3'],
+ explanations:{
+   s1:'Pull-Ups (grand dorsal, bicep) puis Push-Ups (pec, tricep) enchainees sans repos = fatigue systemique du buste superieur. L ordre optimal separe les mouvements de buste : Squats, Push-Ups, Squats, Pull-Ups.',
+   s3:'Sans repos entre les 4 stations, l athlete arrive sur la station 2 avec la fatigue de la station 1. Le protocole Tabata original cible un seul mouvement. Pour plusieurs stations, prevoir 2-3 min de repos entre chaque.'
+ }
+}
+,{diff:'intermediaire',
+ wod:'For Time\n21-15-9\nKettlebell Swings (32kg)\nGoblet Squats (32kg)\nSumo Deadlift High Pull KB (32kg)',
+ intention:'Triplet kettlebell sur filiere anaerobie lactique',
+ suspects:[
+   {id:'s1',text:'Les trois mouvements sollicitent tous la chaine posterieure sans antagoniste'},
+   {id:'s2',text:'Le KB Swing et le SDHP partagent le meme pattern de hinge explosif'},
+   {id:'s3',text:'32kg est bien calibre pour ce triplet'},
+   {id:'s4',text:'La structure 21-15-9 est adaptee a ce triplet KB'},
+   {id:'s5',text:'L absence de mouvement de buste superieur limite l interet du WOD'}
+ ],
+ real_errors:['s1','s2'],
+ explanations:{
+   s1:'KB Swing, Goblet Squat et SDHP sollicitent tous lombaires, fessiers et ischios sans pattern antagoniste. La fatigue locale s accumule rapidement sur les memes groupes musculaires.',
+   s2:'KB Swing et SDHP partagent exactement le pattern hinge explosif. Les enchainer dans le meme WOD revient a repeter le meme stimulus, surchargant la chaine posterieure sans variation.'
+ }
+}
+,{diff:'avance',
+ wod:'E2MOM x 20 min (10 rounds)\nMin impaires : 3 Clean & Jerk @ 85% + 5 T2B\nMin paires : 12 Cal Assault Bike sprint',
+ intention:'Seuil lactique sur triplet mixte, ratio T:R 1:1 effectif',
+ suspects:[
+   {id:'s1',text:'85% 1RM en C&J est trop lourd pour 5 rounds cumulatifs'},
+   {id:'s2',text:'Le T2B apres C&J pre-fatigue les flechisseurs de hanche pour les prochains C&J'},
+   {id:'s3',text:'Le ratio T:R effectif necessite verification'},
+   {id:'s4',text:'L Assault Bike sprint toutes les 2 min est bien calibre'},
+   {id:'s5',text:'Ce format cree un bon stimulus mixte'}
+ ],
+ real_errors:['s1','s2'],
+ explanations:{
+   s1:'5 rounds de 3 C&J a 85% = 15 reps quasi-maximales. La technique de jerk se degradera des le round 3. Pour un EMOM multi-rounds, 75-80% 1RM est le maximum coherent.',
+   s2:'Les T2B exigent une compression maximale des flechisseurs de hanche. Le C&J utilise ces memes flechisseurs dans la phase squat. Enchainer T2B puis C&J genere une fatigue cumulative qui reduit la profondeur du clean et la stabilite du jerk.'
+ }
+}
+,{diff:'debutant',
+ wod:'AMRAP 15 min\n5 Pull-Ups\n10 Push-Ups\n15 Air Squats\n20 Sit-Ups',
+ intention:'Variante de Cindy avec core, filiere aerobie',
+ suspects:[
+   {id:'s1',text:'Les 20 Sit-Ups par round vont creer une fatigue de core progressive'},
+   {id:'s2',text:'Le volume par round (50 reps) est trop eleve pour 15 min d AMRAP'},
+   {id:'s3',text:'La duree de 15 min est insuffisante pour la filiere aerobie'},
+   {id:'s4',text:'Pull-Ups et Sit-Ups creent une interference sur les flechisseurs de hanche'},
+   {id:'s5',text:'Ce WOD est un amelioration pertinente de Cindy'}
+ ],
+ real_errors:['s1','s2'],
+ explanations:{
+   s1:'20 Sit-Ups par round sur 15 min = 150-200 sit-ups totaux. La fatigue des flechisseurs de hanche (utilises aussi dans le kipping pull-up) va degrader progressivement la qualite des Pull-Ups et la stabilite du tronc dans les Air Squats.',
+   s2:'50 reps par round vs 30 dans Cindy = 67% plus de volume par cycle. Le rythme va chuter significativement. Pour 15 min equilibre, viser 25-35 reps par round maximum.'
+ }
+}
+,{diff:'intermediaire',
+ wod:'Chipper For Time\n30 HSPU\n30 Thrusters @ 43kg\n30 Pull-Ups\n30 Box Jumps (60cm)\n30 Deadlifts @ 70kg',
+ intention:'Seance de capacite globale force-cardio',
+ suspects:[
+   {id:'s1',text:'HSPU et Thrusters consecutifs creent une interference majeure sur les epaules'},
+   {id:'s2',text:'Deadlifts en fin de chipper apres 120 reps compromettent la position lombaire'},
+   {id:'s3',text:'L ordre ne respecte pas le principe de placement technique'},
+   {id:'s4',text:'150 reps totaux est raisonnable pour ce niveau'},
+   {id:'s5',text:'Box Jump est un bon choix de pattern milieu de chipper'}
+ ],
+ real_errors:['s1','s2','s3'],
+ explanations:{
+   s1:'HSPU puis Thrusters = double sollicitation consecutive des deltoides et tricep sans recuperation. La fatigue du HSPU impacte directement la phase push press du Thruster.',
+   s2:'30 Deadlifts a 70kg en fin de chipper apres 120 reps = position lombaire compromise. Le deadlift necessite une chaine posterieure fraiche pour maintenir la neutralite du dos.',
+   s3:'L ordre correct : mouvements techniques/lourds en premier, puis gymnastics complexe, puis mouvements simples. L ordre actuel fait exactement l inverse avec HSPU en premier mais Deadlifts en dernier.'
+ }
+}
+,{diff:'avance',
+ wod:'For Time — Race format\n1km Run + 50 Thrusters @ 43kg + 1km Run\npuis 3 min repos\n800m Run + 40 Thrusters @ 52kg + 800m Run\npuis 3 min repos\n400m Run + 30 Thrusters @ 61kg + 400m Run',
+ intention:'Peaking competition sur filiere aerobie-lactique, 3 WODs enchainees',
+ suspects:[
+   {id:'s1',text:'3 min de repos est insuffisant pour recuperer entre les WODs'},
+   {id:'s2',text:'Le volume total depasse largement ce qui est recuperable en seance unique'},
+   {id:'s3',text:'Run et Thrusters creent une interference sur les quadriceps'},
+   {id:'s4',text:'L augmentation de charge compensee par le volume reduit est bien calibree'},
+   {id:'s5',text:'Ce format est adapte au peaking de competition'}
+ ],
+ real_errors:['s1','s2','s3'],
+ explanations:{
+   s1:'3 min de repos apres un WOD de run + 50 Thrusters est insuffisant. La FC ne redescend pas, les quadriceps restent en acidose. Le WOD 2 sera execute avec une penalite de 20-30% sur les performances.',
+   s2:'3 WODs avec 2.2km run + 120 Thrusters = effort total de 45-70 min. C est un volume de preparation semaine, pas une seance de peaking. Le peaking implique des volumes reduits et des intensites elevees.',
+   s3:'Run (quad-dominant) encadre les Thrusters (quad-dominant). Pre-fatigue et post-fatigue des quadriceps limitant la puissance du squat et augmentant le risque blessure genou.'
+ }
+}
+,{diff:'avance',
+ wod:'E1MOM x 20 min\nMin 1 : 10 Thrusters @ 60kg\nMin 2 : 10 C2B Pull-Ups\nMin 3 : 10 Box Jumps 70cm\nMin 4 : 10 HSPU\n(Cycle de 4, 5 cycles)',
+ intention:'Developpement aerobie multi-pattern sur EMOM 4 stations',
+ suspects:[
+   {id:'s1',text:'HSPU et Thrusters dans le meme cycle creent une interference sur les epaules'},
+   {id:'s2',text:'10 reps par mouvement en 60s laisse trop peu de repos'},
+   {id:'s3',text:'60kg de Thruster en EMOM 1 min avec 10 reps est irrealisable des le round 3'},
+   {id:'s4',text:'5 cycles est un volume bien calibre'},
+   {id:'s5',text:'Box Jump 70cm est adapte a ce format'}
+ ],
+ real_errors:['s1','s2','s3'],
+ explanations:{
+   s1:'Le cycle place HSPU apres Thrusters avec seulement 2 stations entre les deux. Sur 5 cycles, deltoides et tricep accumulent une fatigue progressive. La qualite des HSPU s effondre des le cycle 3.',
+   s2:'10 reps de Thrusters a 60kg ou HSPU en 60s laisse 10-15s de repos maximum. Pour maintenir la qualite sur 20 min, le repos doit etre d au moins 20-25s. Reduire a 6-7 reps.',
+   s3:'10 Thrusters a 60kg = 45-55s de travail. Il reste 5-15s de repos avant de recommencer. Des le round 3, l athlete est en retard sur l horloge et le WOD perd toute structure EMOM.'
+ }
+}
+,{diff:'debutant',
+ wod:'For Time\n10-9-8-7-6-5-4-3-2-1\nDeadlifts @ 140kg\nBurpees',
+ intention:'Benchmark de force-endurance, duree cible 12 min',
+ suspects:[
+   {id:'s1',text:'140kg en Deadlift est trop lourd pour un format ladder descendante For Time'},
+   {id:'s2',text:'55 reps totales de Deadlift a 140kg est un volume dangereux'},
+   {id:'s3',text:'La duree reelle sera 25-45 min, pas 12 min'},
+   {id:'s4',text:'Deadlift et Burpee partagent le pattern de hinge'},
+   {id:'s5',text:'La structure ladder descendante est inadaptee pour les mouvements lourds'}
+ ],
+ real_errors:['s1','s2','s3'],
+ explanations:{
+   s1:'140kg correspond a 85-95% 1RM pour la plupart des athletes. Un set de 10 a cette charge est quasi-maximal. Sous pression temporelle For Time, l athlete va sacrifier la mecanique. Pour une ladder For Time : 60-70% 1RM maximum.',
+   s2:'55 Deadlifts a 140kg = charge cumulee massive sur lombaires et chaine posterieure. Meme des powerlifters avances ne font pas 55 reps a cette intensite. Risque de blessure lombaire grave.',
+   s3:'Avec 140kg, l athlete fera des singles des le set de 10. 55 singles lourds avec burpees = 30-45 min de WOD. La duree cible de 12 min est completement incompatible.'
+ }
+}
+,{diff:'intermediaire',
+ wod:'AMRAP 10 min\n3 Power Snatches @ 75% 1RM\n6 Overhead Squats @ 75% 1RM\n9 Bar Facing Burpees',
+ intention:'Capacite anaerobie sur triplet haltero-cardio',
+ suspects:[
+   {id:'s1',text:'75% 1RM en OHS sur AMRAP 10 min va generer une fatigue technique progressive'},
+   {id:'s2',text:'9 Bar Facing Burpees apres OHS compromet la recuperation des stabilisateurs epaule'},
+   {id:'s3',text:'Le ratio reps 3-6-9 est bien calibre'},
+   {id:'s4',text:'10 min est trop court pour ce triplet'},
+   {id:'s5',text:'Power Snatch et OHS a meme charge creent un complexe coherent'}
+ ],
+ real_errors:['s1','s2'],
+ explanations:{
+   s1:'L OHS a 75% 1RM necessite une stabilisation overhead parfaite. Sur AMRAP 10 min, la fatigue va degrader la position overhead et l alignement. Des le round 4-5, les no-reps et blessures d epaule deviennent probables. Pour AMRAP multi-rounds : 60-65% 1RM maximum.',
+   s2:'L OHS maintient la barre overhead = travail constant des stabilisateurs epaule. Le Bar Facing Burpee enchaine immediatement apres ne laisse aucune recuperation a ces stabilisateurs. La qualite du prochain OHS en sera directement impactee.'
+ }
+}
+
+]; /* fin DIAG_BANK */
+
+
 /* ===== LEARN SECTION ===== */
 
 /* --- Toggle learn section --- */
@@ -1314,61 +2198,13 @@ function setDiagDiff(diff) {
 }
 
 function generateDiag() {
-  var area = document.getElementById('diag-area');
-  area.innerHTML = '<div class="diag-loading"><div class="diag-loading-dot"></div><div class="diag-loading-dot"></div><div class="diag-loading-dot"></div><span>Generation du WOD en cours...</span></div>';
   diagChecked = [];
   diagData = null;
-
-  var diffInstructions = {
-    debutant:      'Cree un WOD avec 2 erreurs evidentes et faciles a reperer (ex: mauvais format pour la filiere, ratio T:R completement inadequat).',
-    intermediaire: 'Cree un WOD avec 2-3 erreurs dont au moins une subtile (ex: volume effectif insuffisant, interference de patterns sous-estimee).',
-    avance:        'Cree un WOD qui semble correct en surface mais contient 3 erreurs cachees (ex: derive de filiere, interferences croisees, volume effectif hors zone malgre un format correct).'
-  };
-
-  var prompt = 'Tu es un expert en preparation physique CrossFit Level 4. Genere un WOD intentionnellement mal concu pour un exercice de diagnostic pedagogique.\n\n' +
-    'Niveau de difficulte : ' + diagDiff + '\n' +
-    diffInstructions[diagDiff] + '\n\n' +
-    'Reponds UNIQUEMENT en JSON valide, sans markdown, sans commentaire, avec exactement cette structure :\n' +
-    '{\n' +
-    '  "wod": "description complete du WOD (format, exercices, sets/reps, charges)",\n' +
-    '  "intention": "objectif declare par le coach qui a concu ce WOD",\n' +
-    '  "suspects": [\n' +
-    '    {"id":"s1","text":"description d une erreur potentielle a evaluer"},\n' +
-    '    {"id":"s2","text":"description d une erreur potentielle a evaluer"},\n' +
-    '    {"id":"s3","text":"description d une erreur potentielle a evaluer"},\n' +
-    '    {"id":"s4","text":"description d une erreur potentielle a evaluer"},\n' +
-    '    {"id":"s5","text":"description d une erreur potentielle a evaluer"}\n' +
-    '  ],\n' +
-    '  "real_errors": ["s1","s3"],\n' +
-    '  "explanations": {\n' +
-    '    "s1": "explication physiologique precise de pourquoi c est une erreur",\n' +
-    '    "s3": "explication physiologique precise de pourquoi c est une erreur"\n' +
-    '  }\n' +
-    '}\n\n' +
-    'Les suspects doivent melanger vraies erreurs et distracteurs plausibles. Les explications doivent etre pedagogiques et ancrees dans la physiologie de l effort.';
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    var raw = '';
-    for (var i = 0; i < data.content.length; i++) {
-      if (data.content[i].type === 'text') raw += data.content[i].text;
-    }
-    raw = raw.replace(/```json/g,'').replace(/```/g,'').trim();
-    diagData = JSON.parse(raw);
-    renderDiag();
-  })
-  .catch(function(err) {
-    document.getElementById('diag-area').innerHTML = '<div class="step-feedback bad">Erreur de generation : ' + err.message + '. Verifie ta connexion internet.</div><div style="margin-top:10px;text-align:center"><div onclick="generateDiag()" class="step-btn" style="display:inline-block">Reessayer</div></div>';
-  });
+  var pool = DIAG_BANK.filter(function(w){ return w.diff === diagDiff; });
+  if (!pool.length) pool = DIAG_BANK;
+  var idx = Math.floor(Math.random() * pool.length);
+  diagData = pool[idx];
+  renderDiag();
 }
 
 function renderDiag() {
