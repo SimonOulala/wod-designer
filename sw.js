@@ -1,4 +1,4 @@
-var CACHE = 'wod-designer-v6';
+var CACHE = 'wod-designer-v7';
 var FILES = [
   '/',
   '/index.html',
