@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LET'S WOD</title>
+<title>WOD Designer</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0d0f10">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -127,6 +127,17 @@ select option{background:#1c1f22;}
 .ref-row{display:flex;justify-content:space-between;font-size:11px;padding:2px 0;font-family:var(--mono);}
 .ref-row span:first-child{color:var(--muted);}
 .ref-row span:last-child{color:var(--accent);}
+.ca-section{background:var(--bg3);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;}
+.ca-section-title{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+.ca-fmt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.ca-fmt-btn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--muted);cursor:pointer;font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.04em;padding:8px 4px;text-align:center;text-transform:uppercase;transition:all .15s;user-select:none;}
+.ca-fmt-btn:hover{border-color:var(--border-hi);color:var(--text);}
+.ca-fmt-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.ca-pat-btn{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:3px;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:var(--bg2);transition:all .15s;user-select:none;}
+.ca-pat-btn:hover{border-color:var(--border-hi);color:var(--text);}
+.ca-pat-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.msg.info{background:var(--blue-bg);color:var(--blue-text);}
+.msg.info::before{content:'i';font-family:var(--mono);font-weight:700;}
 footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;display:flex;justify-content:space-between;}
 @media(max-width:520px){
   .row2{grid-template-columns:1fr;}
@@ -241,7 +252,7 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
 
 <header>
   <h1>WOD Designer</h1>
-  <p>// Analyse physiologique — formats & patterns — bibliotheque — v1.6.1</p>
+  <p>// Analyse physiologique — formats & patterns — bibliotheque — v2.0</p>
 </header>
 
 <!-- ===== SECTION APPRENDRE ===== -->
@@ -257,6 +268,7 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
     <div class="learn-tabs">
       <div class="learn-tab active" id="ltab-build" onclick="openLearnTab('build')">1 — Constructeur</div>
       <div class="learn-tab" id="ltab-diag"  onclick="openLearnTab('diag')">2 — Diagnostic</div>
+      <div class="learn-tab" id="ltab-create" onclick="openLearnTab('create')">3 — Creer &amp; Analyser</div>
     </div>
 
     <!-- PANEL CONSTRUCTEUR -->
@@ -424,10 +436,13 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
   <div class="field">
     <label>Filiere cible</label>
     <select id="energy" onchange="calc()">
-      <option value="aerobic">Aerobie -- VO2max / endurance</option>
-      <option value="lactate">Seuil lactique</option>
-      <option value="anaerobic">Anaerobie -- capacite / puissance</option>
-      <option value="alactate">Phosphocreatine -- puissance max</option>
+      <option value="aerobic_vo2">Puissance aerobie — VO2max / PMA</option>
+      <option value="aerobic_seuil">Seuil lactique — SV2</option>
+      <option value="aerobic_z2">Capacite aerobie — Zone 2 / continu</option>
+      <option value="lactate_pow">Puissance lactique — 15s a 1 min</option>
+      <option value="lactate_cap">Capacite lactique — 1 a 3 min</option>
+      <option value="alactate_pow">Alactique puissance — vitesse max</option>
+      <option value="alactate_cap">Alactique capacite — RSA</option>
     </select>
   </div>
   <div class="field">
@@ -466,18 +481,331 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
 </footer>
 </div>
 
+    <!-- PANEL CREER & ANALYSER -->
+    <div class="learn-panel" id="lpanel-create">
+      <div style="font-size:12px;color:var(--muted)">Chargement...</div>
+    </div>
+
 <script>
 var currentFmt = 'emom';
 var currentTab = null;
 var checkedPatterns = [];
 
 var CONTINUOUS = ['amrap','fortime','afap','chipper','buyin','ladder'];
-var TARGETS = {
-  alactate: {ratio_min:5,ratio_max:8,dur_min:0.5,dur_max:4,label:'Phosphocreatine'},
-  anaerobic:{ratio_min:2,ratio_max:4,dur_min:2,dur_max:8,label:'Anaerobie lactique'},
-  lactate:  {ratio_min:1,ratio_max:1.5,dur_min:6,dur_max:20,label:'Seuil lactique'},
-  aerobic:  {ratio_min:0.3,ratio_max:1,dur_min:10,dur_max:40,label:'Aerobie / VO2max'}
+/* =====================================================================
+   MOTEUR PHYSIOLOGIQUE v2.0
+   Basé sur : Caillaud/Broussal (DUEPP), Aubert/Pialoux, ATP School
+   Règles validées : 5 règles + cinétique PCr
+===================================================================== */
+
+/* --- Filières avec sous-zones puissance/capacité --- */
+var FILIERE_ZONES = [
+  {
+    id:'alactate_pow', label:'Alactique — Puissance (vitesse max)',
+    dur_min:0, dur_max:0.12,        /* 0 à 7s */
+    ratio_tr_min:30, ratio_tr_max:50,
+    note:'Fibres IIx, ATP-PCr. Resynthese PCr : 70% en 50s, 85% en 2min, 90% en 4min. Necessite de l oxygene (mitochondries). Recup OBLIGATOIREMENT > 4 min pour puissance pure.'
+  },
+  {
+    id:'alactate_cap', label:'Alactique — Capacite (endurance vitesse)',
+    dur_min:0.07, dur_max:0.25,     /* 4s à 15s */
+    ratio_tr_min:15, ratio_tr_max:30,
+    note:'RSA (Repeated Sprint Ability). Recup 1m30-2min acceptable si objectif = endurance de puissance. Basculement progressif dans la glycolyse.'
+  },
+  {
+    id:'lactate_pow', label:'Anaerobie lactique — Puissance',
+    dur_min:0.25, dur_max:1,        /* 15s à 1min */
+    ratio_tr_min:3, ratio_tr_max:4,
+    note:'Glycolyse rapide. Lactatemie > 12 mmol/L. Ions H+ inhibent PFK1 pour proteger la cellule. Contribution aerobie : 20-40%.'
+  },
+  {
+    id:'lactate_cap', label:'Anaerobie lactique — Capacite',
+    dur_min:1, dur_max:3,           /* 1 à 3min */
+    ratio_tr_min:2, ratio_tr_max:3,
+    note:'Tolerance a l acidose. Fonctionner avec acidose residuelle. Contribution aerobie : 40-60%. Deja massivement aerobie.'
+  },
+  {
+    id:'aerobic_vo2', label:'Aerobie — Puissance VO2max (PMA)',
+    dur_min:3, dur_max:10,          /* 3 à 8-10min */
+    ratio_tr_min:0.67, ratio_tr_max:1,  /* 1:1 à 1.5:1 */
+    note:'Tlim VO2max : 4-8 min en moyenne. HIT 30/30 ou 15/15. Contribution aerobie : 70-90%. Au-dela de 8 min, impossible de maintenir 100% VO2max.'
+  },
+  {
+    id:'aerobic_seuil', label:'Aerobie — Seuil lactique (SV2)',
+    dur_min:20, dur_max:60,
+    ratio_tr_min:2, ratio_tr_max:2,     /* 2:1 strict */
+    note:'Methode alternee : recup = 1/2 temps effort. Maintien proche clairance des lactates. SV2 = 85-90% VMA.'
+  },
+  {
+    id:'aerobic_z2', label:'Aerobie — Capacite (Zone 2, continu)',
+    dur_min:20, dur_max:999,
+    ratio_tr_min:999, ratio_tr_max:999, /* continu */
+    note:'Effort continu. Pas de ratio T:R. Developpement base aerobie, capillarisation, oxydation des lipides.'
+  }
+];
+
+/* Backward-compat shim: map old energy keys to FILIERE_ZONES */
+var TARGETS_COMPAT = {
+  aerobic_vo2:   {dur_min:3,  dur_max:10, label:'Puissance aerobie VO2max'},
+  aerobic_seuil: {dur_min:20, dur_max:60, label:'Seuil lactique SV2'},
+  aerobic_z2:    {dur_min:20, dur_max:999,label:'Capacite aerobie Z2'},
+  lactate_pow:   {dur_min:0.25,dur_max:1, label:'Puissance lactique'},
+  lactate_cap:   {dur_min:1,  dur_max:3,  label:'Capacite lactique'},
+  alactate_pow:  {dur_min:0,  dur_max:0.12,label:'Alactique puissance'},
+  alactate_cap:  {dur_min:0.07,dur_max:0.25,label:'Alactique capacite'},
+  /* Legacy keys */
+  aerobic:   {dur_min:10, dur_max:40, label:'Aerobie VO2max'},
+  lactate:   {dur_min:6,  dur_max:20, label:'Seuil lactique'},
+  anaerobic: {dur_min:2,  dur_max:8,  label:'Anaerobie lactique'},
+  alactate:  {dur_min:0,  dur_max:0.25,label:'Alactique'}
 };
+
+/* --- Règle clé : filière dominante selon durée effective CrossFit --- */
+function getFiliereFromDuration(workMinutes, ratioTR) {
+  /* workMinutes = durée effective de travail en minutes
+     ratioTR = ratio T:R numérique (travail/repos), null si continu */
+  
+  var workSec = workMinutes * 60;
+  
+  /* Règle 1 : effort < 15s -> alactique possible */
+  if (workSec <= 7 && ratioTR !== null && (1/ratioTR) >= 30) {
+    return FILIERE_ZONES[0]; /* alactique puissance */
+  }
+  if (workSec <= 15 && ratioTR !== null && (1/ratioTR) >= 15) {
+    return FILIERE_ZONES[1]; /* alactique capacite */
+  }
+  
+  /* Règle 2 : CrossFit — jamais alactique pur sur mouvements complexes */
+  /* En CrossFit, les mouvements durent toujours > 15s effectifs */
+  
+  /* Règle 3 : Durée effective totale */
+  if (workMinutes <= 1) return FILIERE_ZONES[2];   /* lactique puissance */
+  if (workMinutes <= 3) return FILIERE_ZONES[3];   /* lactique capacite */
+  if (workMinutes <= 10) return FILIERE_ZONES[4];  /* VO2max */
+  if (workMinutes <= 20) {
+    /* Zone ambigue 10-20 min : VO2max ou seuil selon intensite */
+    return FILIERE_ZONES[4]; /* default VO2max — annotation ajoutee */
+  }
+  if (ratioTR === null) return FILIERE_ZONES[6];   /* continu = Z2 */
+  return FILIERE_ZONES[5]; /* seuil lactique */
+}
+
+/* --- Moteur d'alerte v2.0 --- */
+function generateAlertsV2(params) {
+  /* params: {fmt, workTotal, restTotal, ratio, energy, movement, 
+              workSec (durée par intervalle en s), charge_pct, 
+              nb_reps_serie, placement_technique, has_ghd, 
+              has_core_before_hinge, has_grip_before_pull} */
+  var alerts = [];
+  var filiere = params.filiere;
+  
+  /* === RÈGLE 1 : Cohérence filière / durée === */
+  if (filiere) {
+    var fz = filiere;
+    var wt = params.workTotal;
+    
+    /* Alerte si durée effective hors zone */
+    if (wt < fz.dur_min && fz.id !== 'alactate_pow') {
+      alerts.push({cls:'bad', cat:'Filiere',
+        msg:'Volume de travail effectif (' + wt + ' min) insuffisant pour la filiere ' + fz.label + '. Minimum : ' + fz.dur_min + ' min.'
+      });
+    }
+    if (wt > fz.dur_max && fz.dur_max < 60) {
+      alerts.push({cls:'warn', cat:'Filiere',
+        msg:'Volume de travail (' + wt + ' min) depasse la zone optimale pour ' + fz.label + ' (max : ' + fz.dur_max + ' min). Tu derives vers une autre filiere.'
+      });
+    }
+  }
+  
+  /* === RÈGLE 2 : Cohérence ratio T:R === */
+  if (params.ratio !== null && filiere) {
+    var r = params.ratio; /* T:R numerique, > 1 = plus de travail que repos */
+    var fid = filiere.id;
+    
+    if (fid === 'alactate_pow' && r > 0.033) { /* 1:30 */
+      alerts.push({cls:'bad', cat:'Ratio T:R',
+        msg:'Ratio T:R (' + r + ':1) trop eleve pour la puissance alactique. Cible : 1:30 a 1:50. La resynthese PCr necessite 4 min — tu travailles l endurance de puissance (RSA), pas la vitesse pure.'
+      });
+    } else if (fid === 'alactate_cap' && r > 0.067) { /* 1:15 */
+      alerts.push({cls:'warn', cat:'Ratio T:R',
+        msg:'Ratio T:R (' + r + ':1) trop eleve pour l alactique capacite. Cible : 1:15 a 1:30 pour la RSA.'
+      });
+    } else if ((fid === 'lactate_pow') && (r > 0.5 || r < 0.25)) {
+      alerts.push({cls:'warn', cat:'Ratio T:R',
+        msg:'Ratio T:R pour la puissance lactique : cible 1:3 a 1:4. Ton ratio (' + r + ':1) sort de cette zone.'
+      });
+    } else if (fid === 'aerobic_vo2' && (r < 0.67 || r > 1.5)) {
+      alerts.push({cls:'warn', cat:'Ratio T:R',
+        msg:'Pour la puissance VO2max (HIT), le ratio cible est 1:1 a 1.5:1 (ex: 30s/30s). Ton ratio (' + r + ':1) ne correspond pas.'
+      });
+    } else if (fid === 'aerobic_seuil' && Math.abs(r - 2) > 0.3) {
+      alerts.push({cls:'warn', cat:'Ratio T:R',
+        msg:'Le seuil lactique (SV2) utilise la methode alternee : ratio 2:1 strict (recup = 1/2 temps effort). Ton ratio (' + r + ':1) s en eloigne.'
+      });
+    }
+  }
+  
+  /* === NOTE PÉDAGOGIQUE PERMANENTE === */
+  alerts.push({cls:'info', cat:'Physiologie moderne',
+    msg:'L aerobie est actif des la 1ere seconde. La "brulure" = ions H+ qui inhibent la PFK1 pour proteger la cellule — pas l absence d oxygene. Tout WOD CrossFit construit le moteur aerobie.'
+  });
+  
+  /* === RÈGLE 5 : Alertes de sécurité === */
+  
+  /* Charge > 80% en AMRAP */
+  if (params.charge_pct > 80 && (params.fmt === 'amrap' || params.fmt === 'fortime' || params.fmt === 'afap')) {
+    alerts.push({cls:'bad', cat:'Securite SNC',
+      msg:'Charge > 80% 1RM en format AMRAP/For Time : echec nerveux = 72h de recuperation, benefice quasi nul vs RIR 2-3. "On ne s entraine jamais a l echec en force" (J.P. Egger).'
+    });
+  }
+  
+  /* Haltero > 70% + > 5-6 reps */
+  if (params.olympic_charge_pct > 70 && params.nb_reps_serie > 5) {
+    alerts.push({cls:'bad', cat:'Halterophilie',
+      msg:'Au-dela de 5-6 reps en haltero a > 70% 1RM, l intention de vitesse disparait. Tu ne developpes plus la puissance — tu fais de l endurance de force avec technique dangereuse.'
+    });
+  }
+  
+  /* Core avant Hinge lourd */
+  if (params.has_core_before_hinge) {
+    alerts.push({cls:'bad', cat:'Core-to-Extremity',
+      msg:'Core fatigue avant Hinge lourd : rupture de la transmission de force. Le gainage est le stabilisateur primaire du Hinge — le pre-fatiguer rompt la chaine cinetique et expose le dos. Invertis l ordre.'
+    });
+  }
+  
+  /* Grip burnout */
+  if (params.has_grip_before_pull) {
+    alerts.push({cls:'warn', cat:'Grip Burnout',
+      msg:'Exercice epuisant la prehension avant un Pull lourd ou de l haltero : l avant-bras devient le facteur limitant. Tu rateras le mouvement de puissance avant que la chaine posterieure ne soit epuisee.'
+    });
+  }
+  
+  /* GHD en volume libre */
+  if (params.has_ghd_free_volume) {
+    alerts.push({cls:'bad', cat:'Securite',
+      msg:'GHD Sit-Up en volume libre (AMRAP/For Time) : risque de rhabdomyolyse. Maximum 15-20 reps par seance si non habitue. Introduire progressivement.'
+    });
+  }
+  
+  /* Mouvement technique en fin de chipper */
+  if (params.has_olympic_end_of_chipper) {
+    alerts.push({cls:'bad', cat:'Ordre Chipper',
+      msg:'Mouvement technique/lourd en fin de chipper : fraicheur nerveuse epuisee. Regle : technique lourde en debut de sequence (SNC frais), mouvements simples en fin.'
+    });
+  }
+  
+  return alerts;
+}
+
+/* --- Cinétique PCr --- */
+var PCR_KINETICS = [
+  {time_s:50,   pct:70,  label:'50s',   use:'Endurance de puissance (RSA) — ~70% Pmax'},
+  {time_s:120,  pct:85,  label:'2 min', use:'RSA avancee — 85-90% Pmax. Sports collectifs'},
+  {time_s:240,  pct:90,  label:'4 min', use:'Puissance maximale — pic de vitesse, 3RM halterophilie'},
+  {time_s:420,  pct:100, label:'7 min', use:'Puissance absolue — 1RM technique, sprint 40m'}
+];
+
+function getPcrAlert(recupSeconds, objectif) {
+  /* objectif: 'puissance_max', 'rsa', 'capacite' */
+  var pct_restored = 0;
+  for (var i = 0; i < PCR_KINETICS.length; i++) {
+    if (recupSeconds >= PCR_KINETICS[i].time_s) pct_restored = PCR_KINETICS[i].pct;
+  }
+  
+  if (objectif === 'puissance_max' && recupSeconds < 240) {
+    return {cls:'bad', 
+      msg:'Recuperation ' + Math.round(recupSeconds/60*10)/10 + ' min = ~' + pct_restored + '% PCr restauree. Il manque ' + (90-pct_restored) + '% de ta batterie pour la puissance maximale. Basculement accelere dans la glycolyse = degradation de la vitesse. Augmente a 4-7 min pour puissance pure.'
+    };
+  }
+  if (objectif === 'rsa' && recupSeconds >= 90 && recupSeconds <= 180) {
+    return {cls:'ok',
+      msg:'Recuperation ' + Math.round(recupSeconds/60*10)/10 + ' min = ~' + pct_restored + '% PCr. Zone RSA (Repeated Sprint Ability). Pertinent pour maintenir haute intensite avec fatigue residuelle — sports collectifs.'
+    };
+  }
+  return null;
+}
+
+/* --- Matrice d'interférences v2.0 --- */
+var INTERFERENCE_MATRIX = [
+  /* Elevée - musculaire */
+  {a:'pull_v',  b:'pull_h',  sev:'high', type:'Musculaire',
+   muscles:'Grand dorsal, grand rond, rhomboides, bicep',
+   note:'Interference totale sur les tracteurs. Les deux ciblent les memes moteurs primaires.'},
+  {a:'squat',   b:'lunge',   sev:'high', type:'Musculaire',
+   muscles:'Quadriceps, fessiers',
+   note:'La fente est biomechaniquement un squat unilateral. Surcharge totale sur quad et fessiers.'},
+  {a:'hinge',   b:'squat',   sev:'high', type:'Musculaire',
+   muscles:'Ischios, fessiers, lombaires, spinaux, quadriceps',
+   note:'Interference totale chaine posterieure + stabilisateurs lombaires. Combinaison a risque si charges lourdes.'},
+  /* Elevée - SNC + musculaire */
+  {a:'olympic', b:'hinge',   sev:'critical', type:'Musculaire + SNC',
+   muscles:'Ischios, fessiers, lombaires + fibres IIx',
+   note:'Hinge lourd detruit la capacite d acceleration de barre et la stabilite overhead. Interference SNC critique.'},
+  {a:'olympic', b:'push_v',  sev:'critical', type:'Musculaire + Articulaire',
+   muscles:'Tricep, deltoide, trapeze',
+   note:'Push vertical pre-fatigue les muscles de verrouillage overhead. Risque de chute de barre en reception.'},
+  {a:'olympic', b:'squat',   sev:'critical', type:'Musculaire + SNC',
+   muscles:'Quad, fessiers, lombaires + fibres IIx',
+   note:'Jambes fatiguees = perte de vitesse de barre et reception compromise. Interference SNC majeure.'},
+  {a:'core_flex',b:'hinge',  sev:'critical', type:'Stabilisation + Securite',
+   muscles:'Stabilisateurs lombaires, psoas, transverse',
+   note:'Core-to-Extremity : le gainage est le stabilisateur primaire du hinge. Pre-fatiguer le centre = rupture de transmission de force + risque lombaire grave.'},
+  /* Elevée - Grip */
+  {a:'carry',   b:'pull_v',  sev:'high', type:'Grip / Avant-bras',
+   muscles:'Flechisseurs des doigts, avant-bras',
+   note:'Grip Burnout : l avant-bras devient le facteur limitant avant la chaine posterieure.'},
+  {a:'carry',   b:'hinge',   sev:'high', type:'Grip / Avant-bras',
+   muscles:'Flechisseurs des doigts, avant-bras',
+   note:'Grip epuise = impossible de maintenir la barre correctement sur un hinge lourd.'},
+  /* Elevée - SSC + SNC */
+  {a:'jump',    b:'squat',   sev:'critical', type:'SSC + SNC',
+   muscles:'Triple extension, cycle etirement-raccourcissement',
+   note:'Pliometrie haute intensite + squat lourd detruit la capacite du SNC a exprimer la vitesse de contraction.'},
+  {a:'jump',    b:'olympic', sev:'critical', type:'SSC + SNC',
+   muscles:'Triple extension, SSC + fibres IIx',
+   note:'Dommages mecaniques pliometriques + epuisement SNC. Ne jamais combiner sans logique de contraste de charge.'},
+  /* Modérée à Élevée */
+  {a:'push_v',  b:'push_h',  sev:'moderate', type:'Musculaire',
+   muscles:'Deltoide anterieur, tricep',
+   note:'Faisceau anterieur de l epaule tres vulnerable au surmenage. Severite dependante du volume global.'},
+  {a:'olympic', b:'pull_v',  sev:'moderate', type:'Trapeze + Grip',
+   muscles:'Trapeze superieur, prehension',
+   note:'Shrug + maintien barre de l haltero vs traction verticale. Interference moderee sur effort sous-maximal.'},
+  {a:'core_flex',b:'squat',  sev:'moderate', type:'Stabilisation',
+   muscles:'Stabilisateurs vertebraux, psoas',
+   note:'Core pre-fatigue reduit la stabilite sous charge lors du squat. Modere si volume core raisonnable.'}
+];
+
+function checkInterferences(patternIds) {
+  var conflicts = [];
+  for (var i = 0; i < patternIds.length; i++) {
+    for (var j = i+1; j < patternIds.length; j++) {
+      var a = patternIds[i], b = patternIds[j];
+      for (var k = 0; k < INTERFERENCE_MATRIX.length; k++) {
+        var m = INTERFERENCE_MATRIX[k];
+        if ((m.a===a && m.b===b) || (m.a===b && m.b===a)) {
+          conflicts.push({
+            patA: a, patB: b,
+            sev: m.sev, type: m.type,
+            muscles: m.muscles, note: m.note
+          });
+        }
+      }
+    }
+  }
+  return conflicts;
+}
+
+/* --- Utilitaire : label sévérité --- */
+function sevLabel(sev) {
+  if (sev==='critical') return {cls:'bad',  label:'Critique (SNC)'};
+  if (sev==='high')     return {cls:'warn', label:'Elevee'};
+  return                       {cls:'ok',   label:'Moderee'};
+}
+
+
+
+
 
 /* =====================================================================
    ALL PATTERNS
@@ -1866,10 +2194,15 @@ function toggleLearn() {
 }
 
 function openLearnTab(tab) {
-  document.getElementById('ltab-build').classList.toggle('active', tab==='build');
-  document.getElementById('ltab-diag').classList.toggle('active', tab==='diag');
-  document.getElementById('lpanel-build').classList.toggle('show', tab==='build');
-  document.getElementById('lpanel-diag').classList.toggle('show', tab==='diag');
+  var tabs = ['build','diag','create'];
+  for (var i=0; i<tabs.length; i++) {
+    var tel = document.getElementById('ltab-'+tabs[i]);
+    var pel = document.getElementById('lpanel-'+tabs[i]);
+    if (tel) tel.classList.toggle('active', tabs[i]===tab);
+    if (pel) pel.classList.toggle('show', tabs[i]===tab);
+  }
+  if (tab==='build' && typeof initBuild === 'function' && buildStep===0) initBuild();
+  if (tab==='create' && typeof renderCreateAnalyze === 'function') renderCreateAnalyze();
 }
 
 /* =====================================================================
@@ -2292,6 +2625,338 @@ function revealDiag() {
 
 
 
+/* =====================================================================
+   ONGLET 3 — CREER & ANALYSER
+===================================================================== */
+var caState = {
+  fmt: 'emom',
+  duration: 20,
+  workSec: 35,
+  interval: 1,
+  intWork: 40,
+  intRest: 20,
+  intention: 'aerobic_vo2',
+  exercisesText: '',
+  patterns: [],
+  charge_pct: 0,
+  olympic_charge_pct: 0,
+  nb_reps_serie: 0,
+  has_ghd: false,
+  has_core_before_hinge: false,
+  has_grip_before_pull: false,
+  has_olympic_end_of_chipper: false,
+  has_olympic_free_amrap: false,
+  analyzed: false
+};
+
+function renderCreateAnalyze() {
+  var html = '';
+  
+  /* Intro */
+  html += '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px">Decris ton WOD etape par etape. L outil analyse la coherence physiologique, les interferences de patterns et les alertes de securite selon les regles v2.0.</div>';
+
+  /* Étape 1 — Format + durée */
+  html += '<div class="ca-section">';
+  html += '<div class="ca-section-title">1 — Format et parametres</div>';
+  html += '<div class="ca-fmt-grid">';
+  var fmts = ['emom','amrap','fortime','afap','intervals','tabata','chipper','buyin','ladder'];
+  var fmtNames = {emom:'EMOM',amrap:'AMRAP',fortime:'For Time',afap:'AFAP',intervals:'Intervals',tabata:'Tabata',chipper:'Chipper',buyin:'Buy-In/Out',ladder:'Ladder'};
+  for (var i=0; i<fmts.length; i++) {
+    html += '<div class="ca-fmt-btn'+(caState.fmt===fmts[i]?' active':'')+'" onclick="caSetFmt(\''+fmts[i]+'\')">' + fmtNames[fmts[i]] + '</div>';
+  }
+  html += '</div>';
+
+  /* Paramètres selon format */
+  html += '<div class="row2" style="margin-top:10px">';
+  if (caState.fmt !== 'tabata') {
+    html += '<div class="field"><label>Duree totale (min)</label><input type="number" id="ca-dur" value="'+caState.duration+'" min="1" max="90" oninput="caState.duration=parseInt(this.value)||20"></div>';
+  }
+  if (caState.fmt === 'emom') {
+    html += '<div class="field"><label>Travail par intervalle (s)</label><input type="number" id="ca-ws" value="'+caState.workSec+'" min="5" max="175" oninput="caState.workSec=parseInt(this.value)||35"></div>';
+  }
+  if (caState.fmt === 'intervals') {
+    html += '</div><div class="row2" style="margin-top:8px"><div class="field"><label>Travail (s)</label><input type="number" id="ca-iw" value="'+caState.intWork+'" min="5" max="300" oninput="caState.intWork=parseInt(this.value)||40"></div>';
+    html += '<div class="field"><label>Repos (s)</label><input type="number" id="ca-ir" value="'+caState.intRest+'" min="5" max="300" oninput="caState.intRest=parseInt(this.value)||20"></div>';
+  }
+  html += '</div>';
+  html += '</div>'; /* ca-section */
+
+  /* Étape 2 — Intention */
+  html += '<div class="ca-section">';
+  html += '<div class="ca-section-title">2 — Intention de seance</div>';
+  html += '<select id="ca-intention" onchange="caState.intention=this.value" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:13px;padding:8px 11px;width:100%;outline:none;-webkit-appearance:none">';
+  var intentions = [
+    {val:'alactate_pow',  label:'Puissance alactique — vitesse max, sprint'},
+    {val:'alactate_cap',  label:'Capacite alactique — RSA, endurance de vitesse'},
+    {val:'lactate_pow',   label:'Puissance lactique — 15s a 1 min maximal'},
+    {val:'lactate_cap',   label:'Capacite lactique — tolerance acidose, 1-3 min'},
+    {val:'aerobic_vo2',   label:'Puissance aerobie — VO2max, PMA, HIT'},
+    {val:'aerobic_seuil', label:'Seuil lactique — SV2, methode alternee'},
+    {val:'aerobic_z2',    label:'Capacite aerobie — Zone 2, endurance fondamentale'}
+  ];
+  for (var j=0; j<intentions.length; j++) {
+    html += '<option value="'+intentions[j].val+'"'+(caState.intention===intentions[j].val?' selected':'')+'>'+intentions[j].label+'</option>';
+  }
+  html += '</select>';
+  html += '</div>';
+
+  /* Étape 3 — Exercices / Patterns */
+  html += '<div class="ca-section">';
+  html += '<div class="ca-section-title">3 — Exercices (texte libre) et Patterns</div>';
+  html += '<textarea id="ca-exercises" placeholder="Decris tes exercices, charges, volumes... Ex : 5 Power Cleans @ 70kg, 10 Pull-Ups, 15 Air Squats" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:12px;padding:9px 11px;outline:none;resize:vertical;min-height:80px;font-family:var(--body);line-height:1.5" oninput="caState.exercisesText=this.value">' + caState.exercisesText + '</textarea>';
+  
+  /* Sélecteur de patterns */
+  html += '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);margin:10px 0 6px;text-transform:uppercase">Patterns impliques (selectionne tout ce qui s applique)</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:5px">';
+  for (var k=0; k<ALL_PATTERNS.length; k++) {
+    var p = ALL_PATTERNS[k];
+    var sel = caState.patterns.indexOf(p.id) !== -1;
+    html += '<div id="cap-'+p.id+'" class="ca-pat-btn'+(sel?' active':'')+'" onclick="caTogglePat(\''+p.id+'\')">' + p.name + '</div>';
+  }
+  html += '</div>';
+  html += '</div>';
+
+  /* Étape 4 — Paramètres de sécurité */
+  html += '<div class="ca-section">';
+  html += '<div class="ca-section-title">4 — Parametres de securite</div>';
+  html += '<div class="row2">';
+  html += '<div class="field"><label>Charge principale (% 1RM)</label><input type="number" id="ca-charge" value="'+caState.charge_pct+'" min="0" max="100" placeholder="0 si non applicable" oninput="caState.charge_pct=parseInt(this.value)||0"></div>';
+  html += '<div class="field"><label>Reps par serie (halterophilie)</label><input type="number" id="ca-reps" value="'+caState.nb_reps_serie+'" min="0" max="30" placeholder="0 si non applicable" oninput="caState.nb_reps_serie=parseInt(this.value)||0"></div>';
+  html += '</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:7px;margin-top:10px">';
+  
+  var checks = [
+    {key:'has_ghd', label:'GHD Sit-Up en volume libre (AMRAP ou For Time)'},
+    {key:'has_core_before_hinge', label:'Flexion/rotation de tronc a haut volume AVANT un hinge lourd'},
+    {key:'has_grip_before_pull', label:'Exercice epuisant la prehension AVANT un pull lourd ou de l halterophilie'},
+    {key:'has_olympic_end_of_chipper', label:'Mouvement d halterophilie ou technique LOURD en fin de chipper'},
+    {key:'has_olympic_free_amrap', label:'Halterophilie > 70% 1RM en format AMRAP/For Time'}
+  ];
+  
+  for (var c=0; c<checks.length; c++) {
+    var ck = checks[c];
+    html += '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--text)">';
+    html += '<input type="checkbox" id="ca-ck-'+ck.key+'" '+(caState[ck.key]?'checked':'')+' onchange="caState[\''+ck.key+'\']=this.checked" style="width:14px;height:14px;cursor:pointer">';
+    html += ck.label;
+    html += '</label>';
+  }
+  html += '</div>';
+  html += '</div>';
+
+  /* Bouton analyser */
+  html += '<div onclick="analyzeWod()" class="step-btn" style="width:100%;text-align:center;margin-top:4px;padding:12px">Analyser ce WOD</div>';
+
+  /* Zone résultats */
+  html += '<div id="ca-results" style="margin-top:16px"></div>';
+
+  document.getElementById('lpanel-create').innerHTML = html;
+  
+  /* Restore textarea value */
+  var ta = document.getElementById('ca-exercises');
+  if (ta) ta.value = caState.exercisesText;
+}
+
+function caSetFmt(fmt) {
+  caState.fmt = fmt;
+  renderCreateAnalyze();
+}
+
+function caTogglePat(id) {
+  var idx = caState.patterns.indexOf(id);
+  if (idx === -1) caState.patterns.push(id);
+  else caState.patterns.splice(idx, 1);
+  var el = document.getElementById('cap-'+id);
+  if (el) el.classList.toggle('active', caState.patterns.indexOf(id) !== -1);
+}
+
+function analyzeWod() {
+  /* Calcul des métriques */
+  var fmt = caState.fmt;
+  var dur = caState.duration;
+  var workTotal = 0, restTotal = 0, ratio = null, formatDesc = '';
+
+  if (fmt === 'emom') {
+    var ws = caState.workSec;
+    var intv_s = (caState.interval || 1) * 60;
+    var rest_s = intv_s - ws;
+    if (rest_s <= 0) { showCaError('La duree de travail depasse l intervalle.'); return; }
+    var rounds = Math.floor((dur*60)/intv_s);
+    workTotal = Math.round(rounds*ws/60*10)/10;
+    restTotal = Math.round(rounds*rest_s/60*10)/10;
+    ratio = Math.round((ws/rest_s)*100)/100;
+    formatDesc = rounds + ' rounds x ' + ws + 's / ' + rest_s + 's';
+  } else if (fmt === 'tabata') {
+    workTotal = 2.7; restTotal = 1.3; ratio = 2; formatDesc = '8 x 20s/10s';
+  } else if (fmt === 'intervals') {
+    var iw = caState.intWork, ir = caState.intRest;
+    var cycles = Math.floor((dur*60)/(iw+ir));
+    workTotal = Math.round(cycles*iw/60*10)/10;
+    restTotal = Math.round(cycles*ir/60*10)/10;
+    ratio = Math.round((iw/ir)*100)/100;
+    formatDesc = cycles + ' rounds x ' + iw + 's / ' + ir + 's';
+  } else {
+    workTotal = dur; formatDesc = dur + ' min';
+  }
+
+  /* Filière réelle */
+  var filiereReelle = getFiliereFromDuration(workTotal, ratio);
+  
+  /* Filière déclarée */
+  var filiereDeclaree = null;
+  for (var i=0; i<FILIERE_ZONES.length; i++) {
+    if (FILIERE_ZONES[i].id === caState.intention) { filiereDeclaree = FILIERE_ZONES[i]; break; }
+  }
+
+  /* Interférences */
+  var interferences = checkInterferences(caState.patterns);
+  
+  /* Alertes sécurité */
+  var alertParams = {
+    fmt: fmt,
+    workTotal: workTotal,
+    restTotal: restTotal,
+    ratio: ratio,
+    filiere: filiereReelle,
+    charge_pct: caState.charge_pct,
+    olympic_charge_pct: caState.charge_pct,
+    nb_reps_serie: caState.nb_reps_serie,
+    has_ghd_free_volume: caState.has_ghd,
+    has_core_before_hinge: caState.has_core_before_hinge,
+    has_grip_before_pull: caState.has_grip_before_pull,
+    has_olympic_end_of_chipper: caState.has_olympic_end_of_chipper
+  };
+  var alerts = generateAlertsV2(alertParams);
+
+  /* Rendu */
+  var html = '';
+  
+  /* Métriques */
+  html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px">';
+  html += '<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:9px 14px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;background:var(--accent);border-radius:50%"></div>Analyse physiologique — v2.0</div>';
+  
+  /* Filière réelle vs déclarée */
+  html += '<div style="padding:12px 14px;border-bottom:1px solid var(--border)">';
+  html += '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Filiere dominante</div>';
+  
+  var match = filiereDeclaree && filiereReelle && (filiereDeclaree.id === filiereReelle.id);
+  
+  html += '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:6px">';
+  html += '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);padding-top:2px;width:70px;flex-shrink:0">Reelle</div>';
+  html += '<div style="font-size:13px;font-weight:500;color:var(--accent)">' + (filiereReelle ? filiereReelle.label : '—') + '</div>';
+  html += '</div>';
+  
+  html += '<div style="display:flex;align-items:flex-start;gap:10px">';
+  html += '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);padding-top:2px;width:70px;flex-shrink:0">Declaree</div>';
+  html += '<div style="font-size:13px;font-weight:500;color:'+(match?'var(--ok-text)':'var(--warn-text)')+'">' + (filiereDeclaree ? filiereDeclaree.label : '—') + (match?' ✓' : ' — Ecart detecte') + '</div>';
+  html += '</div>';
+  
+  if (!match && filiereDeclaree && filiereReelle) {
+    html += '<div style="font-size:11px;color:var(--warn-text);background:var(--warn-bg);border-radius:var(--r);padding:8px 10px;margin-top:8px">Ton intention (' + filiereDeclaree.label + ') ne correspond pas a la filiere dominante du WOD (' + filiereReelle.label + '). Soit tu ajustes les parametres, soit tu revois l intention declaree.</div>';
+  }
+  html += '</div>';
+  
+  /* Métriques chiffrées */
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border)">';
+  var metrics = [
+    ['Travail effectif', workTotal + ' min'],
+    ['Ratio T:R', ratio !== null ? ratio + ':1' : 'Continu'],
+    ['Structure', formatDesc]
+  ];
+  for (var m=0; m<metrics.length; m++) {
+    html += '<div style="padding:10px 12px;border-right:1px solid var(--border)">';
+    html += '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">' + metrics[m][0] + '</div>';
+    html += '<div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--accent)">' + metrics[m][1] + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  
+  /* Note filière */
+  if (filiereReelle) {
+    html += '<div style="padding:10px 14px;font-size:11px;color:var(--muted);line-height:1.6;border-bottom:1px solid var(--border)">' + filiereReelle.note + '</div>';
+  }
+  html += '</div>';
+
+  /* Interférences */
+  if (caState.patterns.length >= 2) {
+    html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px">';
+    html += '<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:9px 14px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase">Interferences de patterns</div>';
+    html += '<div style="padding:10px 14px">';
+    
+    if (interferences.length === 0) {
+      html += '<div class="msg ok" style="font-size:11px">Aucune interference detectee entre les patterns selectionnes.</div>';
+    } else {
+      for (var ic=0; ic<interferences.length; ic++) {
+        var cf = interferences[ic];
+        var sl = sevLabel(cf.sev);
+        var patA = getPattern(cf.patA), patB = getPattern(cf.patB);
+        html += '<div class="msg ' + sl.cls + '" style="font-size:11px;margin-bottom:6px">';
+        html += '<div><strong>' + sl.label + '</strong> — ' + (patA?patA.name:cf.patA) + ' + ' + (patB?patB.name:cf.patB) + '</div>';
+        html += '<div style="margin-top:3px;opacity:.85">Muscles/systemes : ' + cf.muscles + '</div>';
+        html += '<div style="margin-top:3px;opacity:.85">' + cf.note + '</div>';
+        html += '</div>';
+      }
+    }
+    html += '</div></div>';
+  }
+
+  /* Alertes sécurité */
+  var realAlerts = alerts.filter(function(a){ return a.cat !== 'Physiologie moderne'; });
+  var pedaAlert = alerts.filter(function(a){ return a.cat === 'Physiologie moderne'; })[0];
+  
+  if (realAlerts.length > 0) {
+    html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px">';
+    html += '<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:9px 14px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase">Alertes de securite</div>';
+    html += '<div style="padding:10px 14px;display:flex;flex-direction:column;gap:7px">';
+    for (var al=0; al<realAlerts.length; al++) {
+      var a = realAlerts[al];
+      html += '<div class="msg '+a.cls+'" style="font-size:11px"><strong>['+a.cat+']</strong> '+a.msg+'</div>';
+    }
+    html += '</div></div>';
+  }
+  
+  /* Note pédagogique permanente */
+  if (pedaAlert) {
+    html += '<div style="background:var(--bg3);border:1px solid var(--accent-dim);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--muted);line-height:1.6">';
+    html += '<span style="font-family:var(--mono);font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:5px">Physiologie moderne</span>';
+    html += pedaAlert.msg;
+    html += '</div>';
+  }
+  
+  /* Verdict */
+  var nbCritical = interferences.filter(function(x){ return x.sev==='critical'; }).length;
+  var nbHigh = interferences.filter(function(x){ return x.sev==='high'; }).length;
+  var nbBadAlerts = realAlerts.filter(function(x){ return x.cls==='bad'; }).length;
+  var total_issues = nbCritical + nbHigh + nbBadAlerts;
+  
+  var verdict, vcls;
+  if (!match && total_issues > 0) { verdict = 'WOD a retravailler — incoherence filiere + alertes actives'; vcls = 'bad'; }
+  else if (!match) { verdict = 'Intention a recalibrer — la filiere reelle diverge de l objectif declare'; vcls = 'warn'; }
+  else if (total_issues > 2) { verdict = 'Structure correcte mais alertes de securite importantes'; vcls = 'warn'; }
+  else if (total_issues > 0) { verdict = 'Filiere coherente — surveille les points d alerte'; vcls = 'warn'; }
+  else { verdict = 'WOD physiologiquement coherent'; vcls = 'ok'; }
+  
+  html += '<div class="msg '+vcls+'" style="font-size:13px;font-weight:500;margin-top:4px"><strong>Verdict : </strong>' + verdict + '</div>';
+  
+  /* Bouton reset */
+  html += '<div onclick="resetCa()" class="step-btn secondary" style="width:100%;text-align:center;margin-top:10px;padding:9px">Nouveau WOD</div>';
+
+  document.getElementById('ca-results').innerHTML = html;
+}
+
+function showCaError(msg) {
+  document.getElementById('ca-results').innerHTML = '<div class="msg bad">' + msg + '</div>';
+}
+
+function resetCa() {
+  caState = {fmt:'emom',duration:20,workSec:35,interval:1,intWork:40,intRest:20,
+    intention:'aerobic_vo2',exercisesText:'',patterns:[],charge_pct:0,
+    olympic_charge_pct:0,nb_reps_serie:0,has_ghd:false,
+    has_core_before_hinge:false,has_grip_before_pull:false,
+    has_olympic_end_of_chipper:false,has_olympic_free_amrap:false,analyzed:false};
+  renderCreateAnalyze();
+}
+
+
 function loadCustomExercises() {
   try {
     var stored = localStorage.getItem('wod_custom_exercises');
@@ -2473,7 +3138,7 @@ function submitAddForm() {
 function calc() {
   var fmt=currentFmt, dur=parseInt(document.getElementById('duration').value)||20;
   var energy=document.getElementById('energy').value, movement=document.getElementById('movement').value;
-  var tgt=TARGETS[energy], workTotal=0, restTotal=0, ratio=null, rounds=0, formatDesc='';
+  var tgt=TARGETS_COMPAT[energy], workTotal=0, restTotal=0, ratio=null, rounds=0, formatDesc='';
 
   if (fmt==='emom') {
     var ws=parseInt(document.getElementById('work-s').value)||35;
@@ -2524,16 +3189,18 @@ function calc() {
   for (var d=0;d<details.length;d++) dHTML+='<div class="drow"><span class="dk">'+details[d][0]+'</span><span class="dv">'+details[d][1]+'</span></div>';
   document.getElementById('detail-rows').innerHTML=dHTML;
 
-  var msgs=[];
-  if (ratio!==null) {
-    if (energy==='alactate'&&ratio>0.5) msgs.push({cls:'bad',text:'Ratio T:R trop eleve pour la filiere phosphocreatine. Cible : 1:5 a 1:8.'});
-    else if (energy==='anaerobic'&&ratio>0.7) msgs.push({cls:'warn',text:'Ratio T:R ('+ratio+':1) trop dense pour l anaerobie lactique. Vise 1:2 a 1:4.'});
-    else if (energy==='aerobic'&&ratio<0.4) msgs.push({cls:'warn',text:'Trop de repos pour un objectif aerobie. La filiere aerobie se developpe sous pression continue.'});
+  var /* ===== Moteur v2.0 ===== */
+  var filiereV2 = getFiliereFromDuration(workTotal, ratio);
+  var alertParams2 = {fmt:fmt, workTotal:workTotal, restTotal:restTotal, ratio:ratio,
+    filiere:filiereV2, charge_pct:0, olympic_charge_pct:0, nb_reps_serie:0,
+    has_ghd_free_volume:false, has_core_before_hinge:false,
+    has_grip_before_pull:false, has_olympic_end_of_chipper:false};
+  var alertsV2 = generateAlertsV2(alertParams2);
+  var msgs = alertsV2.map(function(a){ return {cls:a.cls==='info'?'ok':a.cls, text:'['+a.cat+'] '+a.msg}; });
+  /* Filiere label update */
+  if (filiereV2) {
+    document.getElementById('m-ratio').title = filiereV2.label;
   }
-  if (workTotal<tgt.dur_min) msgs.push({cls:'bad',text:'Volume effectif ('+workTotal+' min) insuffisant. Minimum : '+tgt.dur_min+' min.'});
-  else if (workTotal>tgt.dur_max) msgs.push({cls:'warn',text:'Volume ('+workTotal+' min) depasse la zone optimale (max : '+tgt.dur_max+' min).'});
-  if (movement==='weightlifting'&&(fmt==='amrap'||fmt==='fortime'||fmt==='afap')&&dur>12) msgs.push({cls:'warn',text:'Halterophilie dominante sans repos sur '+dur+' min : risque de degradation technique. Envisage un EMOM.'});
-  if (movement==='gymnastics'&&fmt==='emom') msgs.push({cls:'ok',text:'EMOM + gymnastics : format optimal pour la technique sous fatigue controlee.'});
   if (fmt==='afap') {
     if (dur<4) msgs.push({cls:'warn',text:'Duree < 4 min : filiere anaerobie quasi-sprint.'});
     else if (dur>20) msgs.push({cls:'warn',text:'Duree > 20 min en AFAP : pacing inevitable. Envisage un AMRAP.'});
