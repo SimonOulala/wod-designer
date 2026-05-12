@@ -138,6 +138,28 @@ select option{background:#1c1f22;}
 .ca-pat-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 .msg.info{background:var(--blue-bg);color:var(--blue-text);}
 .msg.info::before{content:'i';font-family:var(--mono);font-weight:700;}
+
+/* ===== NAVIGATION 2 NIVEAUX ===== */
+.main-tabs{display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(--accent);}
+.main-tab{flex:1;padding:11px 8px;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-bottom:none;transition:all .15s;user-select:none;}
+.main-tab:first-child{border-radius:var(--r) 0 0 0;}
+.main-tab:last-child{border-radius:0 var(--r) 0 0;}
+.main-tab:hover{color:var(--text);}
+.main-tab.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent);}
+.main-panel{display:none;background:var(--bg2);border:1px solid var(--accent);border-top:none;border-radius:0 0 var(--r) var(--r);margin-bottom:24px;}
+.main-panel.show{display:block;}
+.sub-tabs{display:flex;border-bottom:1px solid var(--border);}
+.sub-tab{flex:1;padding:10px 6px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-right:1px solid var(--border);transition:all .15s;user-select:none;}
+.sub-tab:last-child{border-right:none;}
+.sub-tab:hover{color:var(--text);background:var(--bg3);}
+.sub-tab.active{background:var(--accent-dim);color:var(--accent);}
+.sub-panel{display:none;padding:16px;}
+.sub-panel.show{display:block;}
+.sub-panel-intro{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+/* Designer panel internal padding */
+#mpanel-design .slabel:first-child{margin-top:16px;}
+#mpanel-design>*:last-child{margin-bottom:16px;}
+
 footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;display:flex;justify-content:space-between;}
 @media(max-width:520px){
   .row2{grid-template-columns:1fr;}
@@ -252,52 +274,52 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
 
 <header>
   <h1>WOD Designer</h1>
-  <p>// Analyse physiologique — formats & patterns — bibliotheque — v2.1</p>
+  <p>// Analyse physiologique — formats &amp; patterns — bibliotheque — v2.1</p>
 </header>
 
+<!-- NAVIGATION PRINCIPALE -->
+<div class="main-tabs">
+  <div class="main-tab active" id="mtab-learn"  onclick="switchMain('learn')">Apprendre</div>
+  <div class="main-tab"        id="mtab-design" onclick="switchMain('design')">WOD Designer</div>
+</div>
+
 <!-- ===== SECTION APPRENDRE ===== -->
-<div class="learn-section">
-  <div class="learn-header" onclick="toggleLearn()">
-    <div class="learn-header-left">
-      <span class="learn-badge">Pedagogie</span>
-      <span class="learn-title">Apprendre a concevoir</span>
-    </div>
-    <span class="learn-toggle" id="learn-toggle-icon">Ouvrir +</span>
+<div class="main-panel show" id="mpanel-learn">
+  <div class="sub-tabs">
+    <div class="sub-tab active" id="stab-build"  onclick="switchSub('build')">1 — Constructeur</div>
+    <div class="sub-tab"        id="stab-diag"   onclick="switchSub('diag')">2 — Diagnostic</div>
+    <div class="sub-tab"        id="stab-create" onclick="switchSub('create')">3 — Creer &amp; Analyser</div>
   </div>
-  <div class="learn-body" id="learn-body">
-    <div class="learn-tabs">
-      <div class="learn-tab active" id="ltab-build" onclick="openLearnTab('build')">1 — Constructeur</div>
-      <div class="learn-tab" id="ltab-diag"  onclick="openLearnTab('diag')">2 — Diagnostic</div>
-      <div class="learn-tab" id="ltab-create" onclick="openLearnTab('create')">3 — Creer &amp; Analyser</div>
-    </div>
 
-    <!-- PANEL CONSTRUCTEUR -->
-    <div class="learn-panel show" id="lpanel-build">
-      <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px">
-        Construis un WOD etape par etape en justifiant chaque decision. L outil valide ta logique avant d avancer. Si tu te trompes, il t explique pourquoi — sans te donner la reponse directement.
-      </div>
-      <div class="step-indicator" id="build-dots"></div>
-      <div id="build-step-area"></div>
-    </div>
+  <div class="sub-panel show" id="spanel-build">
+    <div class="sub-panel-intro">Construis un WOD etape par etape en justifiant chaque decision. L outil valide ta logique avant d avancer. Si tu te trompes, il t explique pourquoi — sans te donner la reponse directement.</div>
+    <div class="step-indicator" id="build-dots"></div>
+    <div id="build-step-area"></div>
+  </div>
 
-    <!-- PANEL DIAGNOSTIC -->
-    <div class="learn-panel" id="lpanel-diag">
-      <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px">
-        Un WOD mal concu t est presente avec son intention declaree. Trouve les erreurs physiologiques avant de voir la correction. Genere par IA — chaque session est unique.
+  <div class="sub-panel" id="spanel-diag">
+    <div class="sub-panel-intro">Un WOD mal concu t est presente avec son intention declaree. Trouve les erreurs physiologiques avant de voir la correction.</div>
+    <div class="diff-selector">
+      <div class="diff-btn active" data-diff="debutant" onclick="setDiagDiff('debutant')">Debutant</div>
+      <div class="diff-btn" data-diff="intermediaire" onclick="setDiagDiff('intermediaire')">Intermediaire</div>
+      <div class="diff-btn" data-diff="avance" onclick="setDiagDiff('avance')">Avance</div>
+    </div>
+    <div id="diag-area">
+      <div style="text-align:center;padding:20px 0">
+        <div onclick="generateDiag()" class="step-btn" style="display:inline-block">Generer un WOD a diagnostiquer</div>
       </div>
-      <div class="diff-selector">
-        <div class="diff-btn active" data-diff="debutant"      onclick="setDiagDiff('debutant')">Debutant</div>
-        <div class="diff-btn"        data-diff="intermediaire" onclick="setDiagDiff('intermediaire')">Intermediaire</div>
-        <div class="diff-btn"        data-diff="avance"        onclick="setDiagDiff('avance')">Avance</div>
-      </div>
-      <div id="diag-area">
-        <div style="text-align:center;padding:20px 0">
-          <div onclick="generateDiag()" class="step-btn" style="display:inline-block">Generer un WOD a diagnostiquer</div>
-        </div>
-      </div>
+    </div>
+  </div>
+
+  <div class="sub-panel" id="spanel-create">
+    <div id="lpanel-create">
+      <div class="sub-panel-intro">Decris ton WOD, l outil l analyse.</div>
     </div>
   </div>
 </div>
+
+<!-- ===== SECTION DESIGNER ===== -->
+<div class="main-panel" id="mpanel-design">
 
 <div class="slabel">01 -- Format</div>
 <div class="fmt-grid">
@@ -499,16 +521,15 @@ footer{margin-top:44px;border-top:1px solid var(--border);padding-top:13px;font-
   <div class="ref-card"><div class="ref-name">Aerobie / VO2max</div><div class="ref-row"><span>Ratio T:R</span><span>2:1 a continu</span></div><div class="ref-row"><span>Duree</span><span>10-40 min</span></div><div class="ref-row"><span>Formats</span><span>AMRAP, For Time, Chipper</span></div></div>
 </div>
 
+</div>
+
 <footer>
   <span>WOD DESIGNER v1.3</span>
   <span>METHODE FORCE HYBRIDE -- COACH SIMON</span>
 </footer>
+
 </div>
 
-    <!-- PANEL CREER & ANALYSER -->
-    <div class="learn-panel" id="lpanel-create">
-      <div style="font-size:12px;color:var(--muted)">Chargement...</div>
-    </div>
 
 <script>
 var currentFmt = 'emom';
@@ -2204,25 +2225,32 @@ var DIAG_BANK = [
 /* ===== LEARN SECTION ===== */
 
 /* --- Toggle learn section --- */
-var learnOpen = false;
-function toggleLearn() {
-  learnOpen = !learnOpen;
-  document.getElementById('learn-body').classList.toggle('open', learnOpen);
-  document.getElementById('learn-toggle-icon').textContent = learnOpen ? 'Fermer -' : 'Ouvrir +';
-  if (learnOpen && buildStep === 0) initBuild();
+function switchMain(panel) {
+  var panels = ['learn','design'];
+  for (var i=0; i<panels.length; i++) {
+    var t = document.getElementById('mtab-'+panels[i]);
+    var p = document.getElementById('mpanel-'+panels[i]);
+    if (t) t.classList.toggle('active', panels[i]===panel);
+    if (p) p.classList.toggle('show', panels[i]===panel);
+  }
+  if (panel==='learn' && buildStep===0) initBuild();
 }
 
-function openLearnTab(tab) {
-  var tabs = ['build','diag','create'];
-  for (var i=0; i<tabs.length; i++) {
-    var tel = document.getElementById('ltab-'+tabs[i]);
-    var pel = document.getElementById('lpanel-'+tabs[i]);
-    if (tel) tel.classList.toggle('active', tabs[i]===tab);
-    if (pel) pel.classList.toggle('show', tabs[i]===tab);
+function switchSub(sub) {
+  var subs = ['build','diag','create'];
+  for (var i=0; i<subs.length; i++) {
+    var t = document.getElementById('stab-'+subs[i]);
+    var p = document.getElementById('spanel-'+subs[i]);
+    if (t) t.classList.toggle('active', subs[i]===sub);
+    if (p) p.classList.toggle('show', subs[i]===sub);
   }
-  if (tab==='build' && typeof initBuild === 'function' && buildStep===0) initBuild();
-  if (tab==='create' && typeof renderCreateAnalyze === 'function') renderCreateAnalyze();
+  if (sub==='build' && buildStep===0) initBuild();
+  if (sub==='create') renderCreateAnalyze();
 }
+
+/* Legacy stubs — kept for any remaining refs */
+function toggleLearn() { switchMain('learn'); }
+function openLearnTab(tab) { switchSub(tab); }
 
 /* =====================================================================
    MECANISME 1 — CONSTRUCTEUR GUIDE
@@ -3248,6 +3276,16 @@ function calc() {
   var mHTML='';
   for (var m=0;m<msgs.length;m++) mHTML+='<div class="msg '+msgs[m].cls+'">'+msgs[m].text+'</div>';
   document.getElementById('messages').innerHTML=mHTML;
+}
+
+
+loadCustomExercises();
+setFmt('emom');
+switchMain('learn');
+switchSub('build');
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() { navigator.serviceWorker.register('/sw.js'); });
 }
 
 </script>
